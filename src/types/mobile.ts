@@ -1,4 +1,6 @@
 export type NavigationTab = "beranda" | "riwayat" | "cuti" | "profil";
+export type AdminTab = "cuti" | "presensi" | "karyawan";
+export type UserRole = "karyawan" | "admin";
 
 export type AppView =
   | "login"
@@ -6,7 +8,8 @@ export type AppView =
   | "presensi_gps"
   | "presensi_sukses"
   | "pengajuan_cuti"
-  | "pengajuan_sukses";
+  | "pengajuan_sukses"
+  | "admin_portal";
 
 export interface UserProfile {
   name: string;
@@ -39,6 +42,9 @@ export interface AttendanceRecord {
 
 export interface LeaveRequest {
   id: string;
+  employeeName: string;
+  nip: string;
+  position: string;
   requestNumber: string;
   leaveType: string;
   date: string;
@@ -67,4 +73,31 @@ export interface LocalQueueItem {
   description: string;
   timestamp: string;
   payload: Record<string, unknown>;
+}
+
+export interface EmployeeItem {
+  id: string;
+  name: string;
+  nip: string;
+  position: string;
+  division: string;
+  email: string;
+  password: string;
+  status: "Aktif" | "Nonaktif";
+  joinDate: string;
+}
+
+export interface AdminAttendanceLog {
+  id: string;
+  employeeName: string;
+  nip: string;
+  position: string;
+  time: string;
+  date: string;
+  locationName: string;
+  distanceMeters: number;
+  maxRadiusMeters: number;
+  isWithinRadius: boolean;
+  coordinates: string;
+  status: "tepat_waktu" | "terlambat";
 }

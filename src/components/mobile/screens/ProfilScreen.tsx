@@ -1,11 +1,11 @@
 "use client";
 
 import React from "react";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, Shield } from "lucide-react";
 import { useMobileApp } from "@/context/MobileAppContext";
 
 export function ProfilScreen() {
-  const { user, logout, setActiveTab, setCurrentView } = useMobileApp();
+  const { user, logout, loginAsAdmin, setActiveTab, setCurrentView } = useMobileApp();
 
   const handleBack = () => {
     setActiveTab("beranda");
@@ -99,8 +99,20 @@ export function ProfilScreen() {
         </div>
       </div>
 
+      {/* Switch to Admin HR Portal button */}
+      <div className="pt-1">
+        <button
+          type="button"
+          onClick={loginAsAdmin}
+          className="w-full h-12 rounded-2xl bg-[#0C2B22] hover:bg-[#12382D] text-[#D5F2C8] text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs active:scale-95"
+        >
+          <Shield className="w-4 h-4 text-[#D5F2C8]" />
+          <span>Buka Portal Admin HR</span>
+        </button>
+      </div>
+
       {/* Keluar dari Akun */}
-      <div className="pt-2">
+      <div className="pt-1 text-center">
         <button
           type="button"
           onClick={logout}
