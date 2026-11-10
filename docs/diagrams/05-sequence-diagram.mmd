@@ -1,0 +1,12 @@
+sequenceDiagram
+autonumber
+actor Employee
+participant NextJS as Next.js Client
+participant Server as Server Action
+participant DB as Supabase DB
+Employee->>NextJS: Lakukan Clock-in dengan GPS
+NextJS->>Server: Kirim Payload Koordinat
+Server->>DB: Validasi Radius Lokasi & Simpan Log
+DB-->>Server: Konfirmasi Berhasil
+Server-->>NextJS: Respon Sukses
+NextJS-->>Employee: Tampilkan Notifikasi Presensi Berhasil

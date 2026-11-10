@@ -1,0 +1,15 @@
+---
+description: Data models, validation, and schema persistence rules
+globs: "**/{models,schemas,db,migrations,entities}/**/*"
+---
+
+# Database Proactivity & Data Integrity
+
+## 1. Schema Authority
+- Base schema designs on the Entity Relationship Diagram located in `docs/diagrams/03-database-erd.mmd`.
+- If the PRD omits necessary database columns (such as created_at, updated_at, deleted_at, uuid primary keys, or foreign key cascades), proactively add them.
+- Always apply indexed lookups on frequently queried columns and foreign keys.
+
+## 2. Validation & Security
+- Never trust user input. Validate all incoming request payloads using strict runtime schema validation.
+- Enforce Row-Level Security (RLS) policies or tenant isolation guards on all database access methods.

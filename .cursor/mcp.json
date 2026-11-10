@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "ngodingpakeprd": {
+      "command": "node",
+      "args": [
+        "./mcp/server.js"
+      ],
+      "env": {
+        "PRD_PATH": "./docs/PRD.md",
+        "DESIGN_PATH": "./docs/DESIGN.md"
+      }
+    }
+  }
+}

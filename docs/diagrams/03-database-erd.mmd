@@ -1,0 +1,65 @@
+erDiagram
+user_profiles ||--o{ employee_shifts : manages
+user_profiles ||--o{ attendance_logs : creates
+user_profiles ||--o{ sync_audit_trail : performs
+fixed_shifts ||--o{ employee_shifts : assigns
+office_locations ||--o{ attendance_logs : bounds
+
+user_profiles {
+  uuid id PK
+  uuid user_id FK
+  string full_name
+  string role
+  datetime created_at
+  datetime updated_at
+}
+
+fixed_shifts {
+  uuid id PK
+  string shift_name
+  string clock_in_time
+  string clock_out_time
+  datetime created_at
+  datetime updated_at
+}
+
+employee_shifts {
+  uuid id PK
+  uuid user_id FK
+  uuid shift_id FK
+  date effective_date
+  datetime created_at
+  datetime updated_at
+}
+
+office_locations {
+  uuid id PK
+  string location_name
+  decimal latitude
+  decimal longitude
+  int radius_meters
+  datetime created_at
+  datetime updated_at
+}
+
+attendance_logs {
+  uuid id PK
+  uuid user_id FK
+  uuid office_id FK
+  string status
+  decimal latitude
+  decimal longitude
+  datetime recorded_at
+  datetime created_at
+  datetime updated_at
+}
+
+sync_audit_trail {
+  uuid id PK
+  uuid user_id FK
+  int total_synced_items
+  string sync_status
+  datetime synced_at
+  datetime created_at
+  datetime updated_at
+}

@@ -1,0 +1,25 @@
+---
+description: Visual and design standards for UI components, layouts, and typography
+globs: "**/*.{tsx,jsx,vue,svelte,html,css}"
+---
+
+# UI & UX Standards: Linear & Vercel Design System
+
+## 1. Strict Zero-Emoji Policy
+- NEVER use raw unicode emojis (such as sparkles, rockets, fire, lightbulbs, or robot faces) in JSX/HTML, headings, button labels, badge text, or alert banners.
+- ALL icons must strictly use monochrome vector SVGs from Lucide React (`lucide-react`) sized precisely between 16px and 20px.
+- No decorative sparkle effects, no floating particle blobs, no glowing fuzzy circles.
+
+## 2. Deep Dark Mode Palette & Surfaces
+- Canvas Background: Deep zinc `#09090b` (bg-zinc-950) or pure subtle dark. Never use washed-out grey.
+- Card & Panel Background: Elevated zinc `#121215` or `#18181b` (bg-zinc-900/60) with subtle 1px border (`border-zinc-800`).
+- Typography Hierarchy:
+  - Heading: High-contrast white (`text-zinc-100`), semibold/bold tracking-tight.
+  - Body: Readable muted zinc (`text-zinc-400`).
+  - Meta/Subtext: Subtle zinc (`text-zinc-500`), text-xs.
+
+## 3. Layout Engineering & Spacing
+- Strict 8pt Grid: All padding, margins, and gaps must follow multi-scale tokens (8px, 16px, 24px, 32px, 48px).
+- Concentric Radius: Child elements must have an optical radius equal to outer radius minus container padding (`r_inner = r_outer - p`).
+- Tabular Numbers: Apply `tabular-nums` or `font-mono` on all metrics, counters, tables, currency, and IDs to eliminate visual layout shifts during updates.
+- Tactile Press States: Interactive buttons must incorporate subtle scale transition (`active:scale-[0.98]` or `active:scale-95`) and clear focus rings (`focus-visible:ring-2 focus-visible:ring-zinc-400`).

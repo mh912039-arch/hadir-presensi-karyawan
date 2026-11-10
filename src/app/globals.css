@@ -1,0 +1,46 @@
+@import "tailwindcss";
+
+@theme {
+  --color-hadir-forest: #0C2B22;
+  --color-hadir-forest-dark: #081D17;
+  --color-hadir-forest-light: #164336;
+  --color-hadir-primary: #0D7A57;
+  --color-hadir-primary-hover: #0A6447;
+  --color-hadir-primary-active: #08523A;
+  --color-hadir-mint: #D5F2C8;
+  --color-hadir-mint-subtle: #E8F6ED;
+  --color-hadir-mint-text: #0D7A57;
+  --color-hadir-bg: #F8FAF9;
+  --color-hadir-card: #FFFFFF;
+  --color-hadir-border: #E8ECE9;
+  --color-hadir-text: #0F172A;
+  --color-hadir-muted: #64748B;
+}
+
+@layer base {
+  :root {
+    --background: #0b0f12;
+    --foreground: #f1f5f9;
+  }
+
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* Custom scrollbar hiding for native mobile feel */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

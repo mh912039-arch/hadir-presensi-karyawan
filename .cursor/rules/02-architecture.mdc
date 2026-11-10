@@ -1,0 +1,22 @@
+---
+description: Architecture boundaries, route groups, and domain separation
+globs: "**/*"
+---
+
+# Architecture Boundaries & Modular Layouts
+
+## 1. Application Layout & Domain Separation
+Organize routes and layouts directly matching the PRD specification:
+1. Root Application Shell (`src/app/`):
+   - Entry point: `src/app/page.tsx` directly represents the core application interface or dashboard.
+   - Distinct role portals (`src/app/([role])/`) are used ONLY when the PRD explicitly specifies multiple distinct user personas.
+   - Do NOT create unnecessary or irrelevant route groups (e.g. do NOT create a marketing folder for developer tools, internal engines, or dashboards).
+2. Navigation & Shell:
+   - Sidebar or Header with dynamic feature links derived directly from `feature_breakdown` in the PRD.
+   - Breadcrumbs, Search, and Status chips for active modules.
+
+## 2. Component Layering
+- `components/ui/`: Primitives (Button, Input, Card, Dialog, Badge, Table).
+- `components/features/`: Domain-specific components mapped to PRD features.
+- `components/layout/`: App shells, Sidebars, Headers, and Breadcrumbs.
+- `lib/utils.ts`: Pure utility helpers (cn, formatters, date helpers).

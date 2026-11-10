@@ -1,0 +1,14 @@
+flowchart TD
+subgraph Client_Tier [Client Tier Next.js 16]
+  A[User Browser MediaRecorder & Local Queue] -->|1. Kirim Payload Presensi & GPS| B[Next.js Server Actions / Route Handlers]
+end
+subgraph Server_Tier [Server Ingestion Tier]
+  B -->|2. Validasi Token Sesi & Zod Schema| C{Cek Sesi Valid?}
+  C -->|Tidak Valid| D[Return 401 Unauthorized]
+  C -->|Valid| E[3. Eksekusi Validasi Haversine Geo-fencing]
+end
+subgraph Storage_Tier [Persistence Tier Supabase]
+  E -->|4. Query public.office_locations & public.employee_shifts| F[(Supabase PostgreSQL Database)]
+  F -->|5. Simpan Log Presensi ke public.attendance_logs| G[Simpan Audit di public.sync_audit_trail]
+  G -->|6. Return Status Berhasil ke Client| A
+end
