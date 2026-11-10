@@ -35,7 +35,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="id">
-      <body className={`${inter.className} min-h-screen bg-[#F1F5F9] text-slate-900 antialiased selection:bg-[#0D7A57] selection:text-white`}>
+      <body className={`${inter.className} min-h-[100dvh] bg-[#F8FAF9] text-slate-900 antialiased selection:bg-[#0D7A57] selection:text-white`}>
         {children}
         <PwaRegister />
       </body>

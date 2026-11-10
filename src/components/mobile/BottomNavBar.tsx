@@ -25,8 +25,8 @@ export function BottomNavBar() {
   ];
 
   return (
-    <div className="w-full shrink-0 bg-white/95 backdrop-blur-md border-t border-slate-100 pt-2 pb-2 px-6 shadow-sm">
-      <div className="grid grid-cols-4 gap-2">
+    <nav className="sticky bottom-0 z-40 w-full bg-white/95 backdrop-blur-md border-t border-slate-100 py-1.5 px-3 shadow-[0_-4px_16px_rgba(0,0,0,0.03)] shrink-0">
+      <div className="grid grid-cols-4 gap-1">
         {navItems.map((item) => {
           const isActive = activeTab === item.tab;
           const Icon = item.icon;
@@ -36,7 +36,7 @@ export function BottomNavBar() {
               key={item.tab}
               type="button"
               onClick={() => handleTabClick(item.tab)}
-              className="group flex flex-col items-center justify-center gap-1 py-1 rounded-xl transition-all duration-150 active:scale-95 cursor-pointer"
+              className="group flex flex-col items-center justify-center gap-0.5 py-1 rounded-xl transition-all duration-150 active:scale-95 cursor-pointer"
             >
               <div
                 className={`flex items-center justify-center w-11 h-7 rounded-xl transition-all duration-200 ${
@@ -46,7 +46,7 @@ export function BottomNavBar() {
                 }`}
               >
                 <Icon
-                  className="w-5 h-5 transition-transform duration-200 group-hover:scale-105"
+                  className="w-5 h-5 transition-transform duration-200"
                   strokeWidth={isActive ? 2.2 : 1.75}
                 />
               </div>
@@ -61,9 +61,6 @@ export function BottomNavBar() {
           );
         })}
       </div>
-
-      {/* iOS Home Indicator Bar */}
-      <div className="w-32 h-[4px] bg-slate-900 rounded-full mx-auto mt-3 mb-1" />
-    </div>
+    </nav>
   );
 }

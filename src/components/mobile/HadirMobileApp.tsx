@@ -19,8 +19,7 @@ export function HadirMobileApp() {
   // 1. Unauthenticated or Login View
   if (!isLoggedIn || currentView === "login") {
     return (
-      <div className="w-full h-full flex flex-col bg-[#F8FAF9] text-slate-900 select-none">
-        <MobileHeader showBrand={false} />
+      <div className="w-full flex-1 flex flex-col bg-[#F8FAF9] text-slate-900 select-none min-h-[100dvh]">
         <LoginScreen />
       </div>
     );
@@ -29,8 +28,7 @@ export function HadirMobileApp() {
   // 2. Presensi GPS Flow (No bottom nav)
   if (currentView === "presensi_gps") {
     return (
-      <div className="w-full h-full flex flex-col bg-[#F8FAF9] text-slate-900 select-none">
-        <MobileHeader showBrand={false} />
+      <div className="w-full flex-1 flex flex-col bg-[#F8FAF9] text-slate-900 select-none min-h-[100dvh]">
         <PresensiGpsScreen />
       </div>
     );
@@ -39,8 +37,7 @@ export function HadirMobileApp() {
   // 3. Presensi Sukses Flow (No bottom nav)
   if (currentView === "presensi_sukses") {
     return (
-      <div className="w-full h-full flex flex-col bg-[#F8FAF9] text-slate-900 select-none">
-        <MobileHeader showBrand={false} />
+      <div className="w-full flex-1 flex flex-col bg-[#F8FAF9] text-slate-900 select-none min-h-[100dvh]">
         <PresensiSuksesScreen />
       </div>
     );
@@ -49,9 +46,10 @@ export function HadirMobileApp() {
   // 4. Pengajuan Cuti View (With bottom nav)
   if (currentView === "pengajuan_cuti") {
     return (
-      <div className="w-full h-full flex flex-col bg-[#F8FAF9] text-slate-900 select-none">
-        <MobileHeader showBrand={false} />
-        <PengajuanCutiScreen />
+      <div className="w-full flex-1 flex flex-col justify-between bg-[#F8FAF9] text-slate-900 select-none min-h-[100dvh]">
+        <div className="flex-1 flex flex-col">
+          <PengajuanCutiScreen />
+        </div>
         <BottomNavBar />
       </div>
     );
@@ -60,8 +58,7 @@ export function HadirMobileApp() {
   // 5. Pengajuan Sukses View (No bottom nav)
   if (currentView === "pengajuan_sukses") {
     return (
-      <div className="w-full h-full flex flex-col bg-[#F8FAF9] text-slate-900 select-none">
-        <MobileHeader showBrand={false} />
+      <div className="w-full flex-1 flex flex-col bg-[#F8FAF9] text-slate-900 select-none min-h-[100dvh]">
         <PengajuanSuksesScreen />
       </div>
     );
@@ -69,27 +66,19 @@ export function HadirMobileApp() {
 
   // 6. Main Tab Navigation Views
   return (
-    <div className="w-full h-full flex flex-col bg-[#F8FAF9] text-slate-900 select-none">
-      {activeTab === "beranda" && (
-        <>
-          <MobileHeader showBrand={true} roleBadgeText="KARYAWAN" />
-          <BerandaScreen />
-        </>
-      )}
+    <div className="w-full flex-1 flex flex-col justify-between bg-[#F8FAF9] text-slate-900 select-none min-h-[100dvh]">
+      <div className="flex-1 flex flex-col">
+        {activeTab === "beranda" && (
+          <>
+            <MobileHeader showBrand={true} roleBadgeText="KARYAWAN" />
+            <BerandaScreen />
+          </>
+        )}
 
-      {activeTab === "riwayat" && (
-        <>
-          <MobileHeader showBrand={false} />
-          <RiwayatScreen />
-        </>
-      )}
+        {activeTab === "riwayat" && <RiwayatScreen />}
 
-      {activeTab === "profil" && (
-        <>
-          <MobileHeader showBrand={false} />
-          <ProfilScreen />
-        </>
-      )}
+        {activeTab === "profil" && <ProfilScreen />}
+      </div>
 
       <BottomNavBar />
     </div>
