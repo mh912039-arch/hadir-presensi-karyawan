@@ -48,7 +48,7 @@ export function ProfilScreen() {
           <div className="flex items-end justify-between mt-1">
             <div>
               <p className="text-xs text-slate-300 font-medium">
-                {user.division.replace("Divisi ", "")} • Product Designer
+                {user.division.replace("Divisi ", "")} • {user.role}
               </p>
               <p className="text-xs text-slate-400 mt-0.5">
                 NIP {user.nip}
@@ -69,8 +69,12 @@ export function ProfilScreen() {
 
         <div className="bg-white rounded-2xl p-4.5 border border-slate-100 shadow-2xs space-y-3 text-xs">
           <div className="flex items-center justify-between">
+            <span className="text-slate-500">Jabatan</span>
+            <span className="font-semibold text-slate-900">{user.role}</span>
+          </div>
+          <div className="flex items-center justify-between">
             <span className="text-slate-500">Divisi</span>
-            <span className="font-semibold text-slate-900">Teknologi</span>
+            <span className="font-semibold text-slate-900">{user.division.replace("Divisi ", "")}</span>
           </div>
           <div className="flex items-center justify-between">
             <span className="text-slate-500">Status kerja</span>

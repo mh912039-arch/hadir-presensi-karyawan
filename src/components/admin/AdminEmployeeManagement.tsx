@@ -17,11 +17,20 @@ import { useMobileApp } from "@/context/MobileAppContext";
 import { EmployeeItem } from "@/types/mobile";
 
 export function AdminEmployeeManagement() {
-  const { employees, addEmployee, updateEmployee, deleteEmployee } = useMobileApp();
+  const {
+    employees,
+    addEmployee,
+    updateEmployee,
+    deleteEmployee,
+    activeUserId,
+    setActiveEmployee,
+    switchRole,
+  } = useMobileApp();
 
   const [searchQuery, setSearchQuery] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [editingEmployee, setEditingEmployee] = useState<EmployeeItem | null>(null);
+  const [savedNotice, setSavedNotice] = useState<string | null>(null);
 
   // Password visibility map by employee ID
   const [visiblePasswords, setVisiblePasswords] = useState<Record<string, boolean>>({});
@@ -73,6 +82,7 @@ export function AdminEmployeeManagement() {
     e.preventDefault();
     if (editingEmployee) {
       updateEmployee(editingEmployee.id, formData);
+      setSavedNotice(`Data "${formData.name}" berhasil diperbarui! Tampilan aplikasi otomatis diperbarui.`);
     } else {
       addEmployee({
         ...formData,
@@ -82,6 +92,7 @@ export function AdminEmployeeManagement() {
           year: "numeric",
         }),
       });
+      setSavedNotice(`Karyawan "${formData.name}" berhasil ditambahkan.`);
     }
     setShowModal(false);
   };
@@ -98,6 +109,22 @@ export function AdminEmployeeManagement() {
 
   return (
     <div className="space-y-4">
+      {/* Success Notification Alert */}
+      {savedNotice && (
+        <div className="p-3 bg-[#E8F6ED] border border-[#D5EEDC] rounded-2xl flex items-center justify-between text-xs text-[#0D7A57] animate-in fade-in duration-200">
+          <div className="flex items-center gap-2">
+            <Check className="w-4 h-4 text-[#0D7A57] shrink-0" />
+            <span className="font-semibold">{savedNotice}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => switchRole("karyawan")}
+            className="px-2.5 py-1 bg-[#0D7A57] text-white rounded-lg text-[11px] font-bold shadow-2xs hover:bg-[#0A6447] active:scale-95 shrink-0 ml-2"
+          >
+            Lihat Tampilan
+          </button>
+        </div>
+      )}
       {/* Top Header Actions */}
       <div className="flex items-center justify-between gap-2">
         <div>
@@ -216,27 +243,47 @@ export function AdminEmployeeManagement() {
                 </div>
               </div>
 
-              {/* Action Buttons: Edit & Delete */}
-              <div className="flex items-center justify-end gap-2 pt-1">
-                <button
-                  type="button"
-                  onClick={() => openEditModal(emp)}
-                  className="px-2.5 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-medium flex items-center gap-1 transition-all cursor-pointer"
-                >
-                  <Edit2 className="w-3 h-3 text-slate-500" />
-                  <span>Ubah Data</span>
-                </button>
+              {/* Action Buttons: Status Active, Edit & Delete */}
+              <div className="flex items-center justify-between gap-2 pt-1 border-t border-slate-100">
+                <div>
+                  {emp.id === activeUserId ? (
+                    <span className="px-2.5 py-1 rounded-lg bg-[#E8F6ED] text-[#0D7A57] text-[11px] font-bold flex items-center gap-1 border border-[#D5EEDC]">
+                      <Check className="w-3.5 h-3.5" />
+                      <span>Akun Aktif</span>
+                    </span>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => setActiveEmployee(emp.id, true)}
+                      className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-[#E8F6ED] text-slate-700 hover:text-[#0D7A57] text-[11px] font-semibold transition-all cursor-pointer"
+                      title="Gunakan akun karyawan ini dan buka tampilannya"
+                    >
+                      Pilih &amp; Lihat
+                    </button>
+                  )}
+                </div>
 
-                {emp.nip !== "20240018" && (
+                <div className="flex items-center gap-1.5">
                   <button
                     type="button"
-                    onClick={() => deleteEmployee(emp.id)}
-                    className="px-2.5 py-1.5 rounded-lg border border-red-200 hover:bg-red-50 text-red-600 text-xs font-medium flex items-center gap-1 transition-all cursor-pointer"
+                    onClick={() => openEditModal(emp)}
+                    className="px-2.5 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-medium flex items-center gap-1 transition-all cursor-pointer"
                   >
-                    <Trash2 className="w-3 h-3 text-red-500" />
-                    <span>Hapus</span>
+                    <Edit2 className="w-3 h-3 text-slate-500" />
+                    <span>Ubah</span>
                   </button>
-                )}
+
+                  {emp.nip !== "20240018" && (
+                    <button
+                      type="button"
+                      onClick={() => deleteEmployee(emp.id)}
+                      className="px-2.5 py-1.5 rounded-lg border border-red-200 hover:bg-red-50 text-red-600 text-xs font-medium flex items-center gap-1 transition-all cursor-pointer"
+                    >
+                      <Trash2 className="w-3 h-3 text-red-500" />
+                      <span>Hapus</span>
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
           );

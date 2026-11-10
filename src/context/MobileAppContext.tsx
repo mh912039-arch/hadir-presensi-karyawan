@@ -29,6 +29,9 @@ interface MobileAppContextType {
 
   // User Profile
   user: UserProfile;
+  setUser: React.Dispatch<React.SetStateAction<UserProfile>>;
+  activeUserId: string;
+  setActiveEmployee: (id: string, autoSwitchToKaryawan?: boolean) => void;
 
   // Attendance & Clock-In
   hasClockedIn: boolean;
@@ -104,7 +107,7 @@ function calculateHaversineDistance(lat1: number, lon1: number, lat2: number, lo
 const defaultUser: UserProfile = {
   name: "Aditya Pratama",
   email: "aditya@nusantara.co.id",
-  role: "Karyawan",
+  role: "Product Designer",
   division: "Divisi Teknologi",
   nip: "20240018",
   status: "Aktif",
@@ -331,8 +334,9 @@ export function MobileAppProvider({ children }: { children: React.ReactNode }) {
   const [adminTab, setAdminTab] = useState<AdminTab>("cuti");
   const [currentView, setCurrentView] = useState<AppView>("main");
 
-  // User
-  const [user] = useState<UserProfile>(defaultUser);
+  // User & Active Account
+  const [activeUserId, setActiveUserId] = useState<string>("emp-1");
+  const [user, setUser] = useState<UserProfile>(defaultUser);
 
   // Attendance
   const [hasClockedIn, setHasClockedIn] = useState(false);
@@ -363,6 +367,64 @@ export function MobileAppProvider({ children }: { children: React.ReactNode }) {
 
   // Active preset tracker
   const [activePresetNumber, setActivePresetNumber] = useState(2);
+
+  // Hydrate from localStorage on client mount
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      let loadedEmployees = initialEmployees;
+      const savedEmployees = localStorage.getItem("hadir_employees");
+      if (savedEmployees) {
+        const parsed = JSON.parse(savedEmployees);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          loadedEmployees = parsed;
+          setEmployees(parsed);
+        }
+      }
+
+      const savedUserId = localStorage.getItem("hadir_active_user_id");
+      const activeId = savedUserId || "emp-1";
+      setActiveUserId(activeId);
+
+      const savedUser = localStorage.getItem("hadir_active_user");
+      if (savedUser) {
+        const parsed = JSON.parse(savedUser);
+        if (parsed && parsed.name) {
+          setUser(parsed);
+        }
+      } else {
+        const target = loadedEmployees.find((e) => e.id === activeId) || loadedEmployees[0];
+        if (target) {
+          setUser({
+            name: target.name,
+            email: target.email,
+            role: target.position,
+            division: target.division.startsWith("Divisi ") ? target.division : `Divisi ${target.division}`,
+            nip: target.nip,
+            status: target.status,
+            companyName: "PT Nusantara Digital",
+            employmentStatus: "Karyawan tetap",
+            joinDate: target.joinDate || "8 Januari 2024",
+            workLocation: "UNPAM Viktor 2",
+          });
+        }
+      }
+
+      const savedLeaves = localStorage.getItem("hadir_leave_requests");
+      if (savedLeaves) {
+        const parsed = JSON.parse(savedLeaves);
+        if (Array.isArray(parsed)) setLeaveRequests(parsed);
+      }
+
+      const savedLogs = localStorage.getItem("hadir_attendance_logs");
+      if (savedLogs) {
+        const parsed = JSON.parse(savedLogs);
+        if (Array.isArray(parsed)) setAdminAttendanceLogs(parsed);
+      }
+    } catch (e) {
+      console.error("Failed to load state from localStorage:", e);
+    }
+  }, []);
 
   // Calculate actual distance based on coordinates
   const currentDistance = calculateHaversineDistance(
@@ -484,6 +546,39 @@ export function MobileAppProvider({ children }: { children: React.ReactNode }) {
       return { success: false, message: msg };
     }
 
+    // Match employee by email if provided
+    if (email) {
+      const cleanEmail = email.trim().toLowerCase();
+      const matched = employees.find((e) => e.email.trim().toLowerCase() === cleanEmail);
+      if (matched) {
+        if (password && matched.password && matched.password !== password) {
+          const msg = "Kata sandi yang Anda masukkan salah.";
+          setLoginError(msg);
+          return { success: false, message: msg };
+        }
+        setActiveUserId(matched.id);
+        const newUser: UserProfile = {
+          name: matched.name,
+          email: matched.email,
+          role: matched.position,
+          division: matched.division.startsWith("Divisi ") ? matched.division : `Divisi ${matched.division}`,
+          nip: matched.nip,
+          status: matched.status,
+          companyName: "PT Nusantara Digital",
+          employmentStatus: "Karyawan tetap",
+          joinDate: matched.joinDate || "8 Januari 2024",
+          workLocation: "UNPAM Viktor 2",
+        };
+        setUser(newUser);
+        if (typeof window !== "undefined") {
+          try {
+            localStorage.setItem("hadir_active_user", JSON.stringify(newUser));
+            localStorage.setItem("hadir_active_user_id", matched.id);
+          } catch (e) {}
+        }
+      }
+    }
+
     // Validasi lolos
     setIsLoggedIn(true);
     setCurrentRole("karyawan");
@@ -552,7 +647,7 @@ export function MobileAppProvider({ children }: { children: React.ReactNode }) {
       id: "log-" + Date.now(),
       employeeName: user.name,
       nip: user.nip,
-      position: user.division,
+      position: user.role,
       time: "07.52 WIB",
       date: "9 Nov 2026",
       locationName: "UNPAM Viktor 2",
@@ -562,7 +657,15 @@ export function MobileAppProvider({ children }: { children: React.ReactNode }) {
       coordinates: `${userLat.toFixed(4)}, ${userLng.toFixed(4)}`,
       status: "tepat_waktu",
     };
-    setAdminAttendanceLogs((prev) => [newAdminLog, ...prev]);
+    setAdminAttendanceLogs((prev) => {
+      const next = [newAdminLog, ...prev];
+      if (typeof window !== "undefined") {
+        try {
+          localStorage.setItem("hadir_attendance_logs", JSON.stringify(next));
+        } catch (e) {}
+      }
+      return next;
+    });
 
     setCurrentView("presensi_sukses");
     return { success: true, queued: isOffline, message: "Presensi berhasil di UNPAM Viktor 2" };
@@ -574,7 +677,7 @@ export function MobileAppProvider({ children }: { children: React.ReactNode }) {
       id: "leave-" + Date.now(),
       employeeName: user.name,
       nip: user.nip,
-      position: "Product Designer",
+      position: user.role,
       requestNumber: "CT-2026-" + Math.floor(1000 + Math.random() * 9000),
       leaveType: leaveType || "Cuti tahunan",
       date: date || "13 November 2026",
@@ -598,32 +701,52 @@ export function MobileAppProvider({ children }: { children: React.ReactNode }) {
     }
 
     setLatestLeaveRequest(newRequest);
-    setLeaveRequests((prev) => [newRequest, ...prev]);
+    setLeaveRequests((prev) => {
+      const next = [newRequest, ...prev];
+      if (typeof window !== "undefined") {
+        try {
+          localStorage.setItem("hadir_leave_requests", JSON.stringify(next));
+        } catch (e) {}
+      }
+      return next;
+    });
     setCurrentView("pengajuan_sukses");
     return { success: true, queued: isOffline };
   };
 
   // Admin Approval: Approve Leave
   const approveLeaveRequest = (id: string) => {
-    setLeaveRequests((prev) =>
-      prev.map((req) =>
+    setLeaveRequests((prev) => {
+      const next = prev.map((req) =>
         req.id === id
-          ? { ...req, status: "disetujui", statusLabel: "Disetujui HR" }
+          ? { ...req, status: "disetujui" as const, statusLabel: "Disetujui HR" }
           : req
-      )
-    );
+      );
+      if (typeof window !== "undefined") {
+        try {
+          localStorage.setItem("hadir_leave_requests", JSON.stringify(next));
+        } catch (e) {}
+      }
+      return next;
+    });
     setRemainingLeaveDays((prev) => Math.max(0, prev - 1));
   };
 
   // Admin Approval: Reject Leave
   const rejectLeaveRequest = (id: string) => {
-    setLeaveRequests((prev) =>
-      prev.map((req) =>
+    setLeaveRequests((prev) => {
+      const next = prev.map((req) =>
         req.id === id
-          ? { ...req, status: "ditolak", statusLabel: "Ditolak HR" }
+          ? { ...req, status: "ditolak" as const, statusLabel: "Ditolak HR" }
           : req
-      )
-    );
+      );
+      if (typeof window !== "undefined") {
+        try {
+          localStorage.setItem("hadir_leave_requests", JSON.stringify(next));
+        } catch (e) {}
+      }
+      return next;
+    });
   };
 
   // Admin: Add Employee
@@ -632,19 +755,158 @@ export function MobileAppProvider({ children }: { children: React.ReactNode }) {
       id: "emp-" + Date.now(),
       ...newEmp,
     };
-    setEmployees((prev) => [created, ...prev]);
+    setEmployees((prev) => {
+      const next = [created, ...prev];
+      if (typeof window !== "undefined") {
+        try {
+          localStorage.setItem("hadir_employees", JSON.stringify(next));
+        } catch (e) {}
+      }
+      return next;
+    });
+  };
+
+  // Switch or set active employee for testing & employee view
+  const setActiveEmployee = (id: string, autoSwitchToKaryawan = false) => {
+    const target = employees.find((e) => e.id === id);
+    if (!target) return;
+
+    setActiveUserId(id);
+    const nextUser: UserProfile = {
+      name: target.name,
+      email: target.email,
+      role: target.position,
+      division: target.division.startsWith("Divisi ") ? target.division : `Divisi ${target.division}`,
+      nip: target.nip,
+      status: target.status,
+      companyName: "PT Nusantara Digital",
+      employmentStatus: "Karyawan tetap",
+      joinDate: target.joinDate || "8 Januari 2024",
+      workLocation: "UNPAM Viktor 2",
+    };
+    setUser(nextUser);
+
+    if (typeof window !== "undefined") {
+      try {
+        localStorage.setItem("hadir_active_user_id", id);
+        localStorage.setItem("hadir_active_user", JSON.stringify(nextUser));
+      } catch (e) {}
+    }
+
+    if (autoSwitchToKaryawan) {
+      setCurrentRole("karyawan");
+      setActiveTab("beranda");
+      setCurrentView("main");
+    }
   };
 
   // Admin: Update Employee
   const updateEmployee = (id: string, updatedData: Partial<EmployeeItem>) => {
-    setEmployees((prev) =>
-      prev.map((emp) => (emp.id === id ? { ...emp, ...updatedData } : emp))
-    );
+    let oldEmp: EmployeeItem | undefined;
+
+    setEmployees((prev) => {
+      oldEmp = prev.find((e) => e.id === id);
+      const next = prev.map((emp) =>
+        emp.id === id ? { ...emp, ...updatedData } : emp
+      );
+      if (typeof window !== "undefined") {
+        try {
+          localStorage.setItem("hadir_employees", JSON.stringify(next));
+        } catch (e) {
+          console.error(e);
+        }
+      }
+      return next;
+    });
+
+    // Check if edited employee is the currently active employee
+    const isCurrentActiveUser =
+      id === activeUserId ||
+      (oldEmp && (user.email.toLowerCase() === oldEmp.email.toLowerCase() || user.nip === oldEmp.nip)) ||
+      (!activeUserId && id === "emp-1");
+
+    if (isCurrentActiveUser) {
+      setUser((prev) => {
+        const nextUser: UserProfile = {
+          ...prev,
+          name: updatedData.name !== undefined ? updatedData.name : prev.name,
+          nip: updatedData.nip !== undefined ? updatedData.nip : prev.nip,
+          role: updatedData.position !== undefined ? updatedData.position : prev.role,
+          division: updatedData.division !== undefined
+            ? (updatedData.division.startsWith("Divisi ") ? updatedData.division : `Divisi ${updatedData.division}`)
+            : prev.division,
+          email: updatedData.email !== undefined ? updatedData.email : prev.email,
+          status: updatedData.status !== undefined ? updatedData.status : prev.status,
+        };
+        if (typeof window !== "undefined") {
+          try {
+            localStorage.setItem("hadir_active_user", JSON.stringify(nextUser));
+          } catch (e) {}
+        }
+        return nextUser;
+      });
+    }
+
+    // Synchronize leave requests for this employee
+    setLeaveRequests((prev) => {
+      const nextRequests = prev.map((req) => {
+        const match =
+          (oldEmp && (req.nip === oldEmp.nip || req.employeeName === oldEmp.name)) ||
+          req.nip === updatedData.nip;
+        if (match) {
+          return {
+            ...req,
+            employeeName: updatedData.name ?? req.employeeName,
+            nip: updatedData.nip ?? req.nip,
+            position: updatedData.position ?? req.position,
+          };
+        }
+        return req;
+      });
+      if (typeof window !== "undefined") {
+        try {
+          localStorage.setItem("hadir_leave_requests", JSON.stringify(nextRequests));
+        } catch (e) {}
+      }
+      return nextRequests;
+    });
+
+    // Synchronize attendance logs for this employee
+    setAdminAttendanceLogs((prev) => {
+      const nextLogs = prev.map((log) => {
+        const match =
+          (oldEmp && (log.nip === oldEmp.nip || log.employeeName === oldEmp.name)) ||
+          log.nip === updatedData.nip;
+        if (match) {
+          return {
+            ...log,
+            employeeName: updatedData.name ?? log.employeeName,
+            nip: updatedData.nip ?? log.nip,
+            position: updatedData.position ?? log.position,
+          };
+        }
+        return log;
+      });
+      if (typeof window !== "undefined") {
+        try {
+          localStorage.setItem("hadir_attendance_logs", JSON.stringify(nextLogs));
+        } catch (e) {}
+      }
+      return nextLogs;
+    });
   };
 
   // Admin: Delete Employee
   const deleteEmployee = (id: string) => {
-    setEmployees((prev) => prev.filter((emp) => emp.id !== id));
+    setEmployees((prev) => {
+      const next = prev.filter((emp) => emp.id !== id);
+      if (typeof window !== "undefined") {
+        try {
+          localStorage.setItem("hadir_employees", JSON.stringify(next));
+        } catch (e) {}
+      }
+      return next;
+    });
   };
 
   // Offline Mode Toggle
@@ -696,6 +958,17 @@ export function MobileAppProvider({ children }: { children: React.ReactNode }) {
 
   // Reset to default
   const resetToDefault = () => {
+    if (typeof window !== "undefined") {
+      try {
+        localStorage.removeItem("hadir_employees");
+        localStorage.removeItem("hadir_active_user");
+        localStorage.removeItem("hadir_active_user_id");
+        localStorage.removeItem("hadir_leave_requests");
+        localStorage.removeItem("hadir_attendance_logs");
+      } catch (e) {}
+    }
+    setUser(defaultUser);
+    setActiveUserId("emp-1");
     setIsLoggedIn(true);
     setCurrentRole("karyawan");
     setActiveTab("beranda");
@@ -712,6 +985,7 @@ export function MobileAppProvider({ children }: { children: React.ReactNode }) {
     setAttendanceHistory(initialAttendanceHistory);
     setEmployees(initialEmployees);
     setLeaveRequests(initialLeaveRequests);
+    setAdminAttendanceLogs(initialAdminLogs);
     setLoginError(null);
     setActivePresetNumber(2);
   };
@@ -753,6 +1027,9 @@ export function MobileAppProvider({ children }: { children: React.ReactNode }) {
         setAdminTab,
         setCurrentView,
         user,
+        setUser,
+        activeUserId,
+        setActiveEmployee,
         hasClockedIn,
         clockInTime,
         attendanceHistory,

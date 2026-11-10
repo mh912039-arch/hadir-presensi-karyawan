@@ -52,7 +52,7 @@ export function BerandaScreen() {
           Selamat pagi, {user.name.split(" ")[0]}
         </h2>
         <p className="text-xs text-slate-500">
-          Product Designer • Divisi Teknologi
+          {user.role} • {user.division.startsWith("Divisi") ? user.division : `Divisi ${user.division}`}
         </p>
       </div>
 
