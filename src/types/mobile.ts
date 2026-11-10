@@ -57,12 +57,17 @@ export interface LeaveRequest {
 }
 
 export interface GPSStatus {
+  isGpsEnabled: boolean;
   isInsideOffice: boolean;
   distanceMeters: number;
   maxRadiusMeters: number;
   accuracyMeters: number;
   officeName: string;
   officeAddress: string;
+  officeLat: number;
+  officeLng: number;
+  userLat: number;
+  userLng: number;
   currentTimeString: string;
   currentDateString: string;
 }

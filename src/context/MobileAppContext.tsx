@@ -38,9 +38,11 @@ interface MobileAppContextType {
   terlambatCount: number;
   cutiCount: number;
 
-  // GPS Simulation
+  // GPS & UNPAM Viktor 2 Geo-fencing
   gps: GPSStatus;
+  toggleGpsEnabled: (enabled: boolean) => void;
   toggleGpsLocation: (inside: boolean) => void;
+  requestRealBrowserGps: () => Promise<{ success: boolean; message: string }>;
   confirmAttendance: () => { success: boolean; queued: boolean; message: string };
 
   // Leave Management (Karyawan & Admin Approval)
@@ -66,8 +68,10 @@ interface MobileAppContextType {
   localQueue: LocalQueueItem[];
   syncLocalQueue: () => void;
 
-  // Auth
-  login: (email?: string, password?: string) => void;
+  // Auth (Strict UNPAM Viktor 2 validation)
+  loginError: string | null;
+  setLoginError: (err: string | null) => void;
+  login: (email?: string, password?: string) => { success: boolean; message: string };
   loginAsAdmin: () => void;
   loginAsKaryawan: () => void;
   logout: () => void;
@@ -76,6 +80,25 @@ interface MobileAppContextType {
   activePresetNumber: number;
   jumpToPreset: (presetNumber: number) => void;
   resetToDefault: () => void;
+}
+
+// Koordinat resmi Kampus UNPAM Viktor (Gedung Viktor 2, Tangerang Selatan)
+const UNPAM_VIKTOR_LAT = -6.3458;
+const UNPAM_VIKTOR_LNG = 106.6917;
+
+// Formula Haversine untuk menghitung jarak akurat dalam satuan meter
+function calculateHaversineDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  const R = 6371e3; // meter
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLon = ((lon2 - lon1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return Math.round(R * c);
 }
 
 const defaultUser: UserProfile = {
@@ -88,7 +111,7 @@ const defaultUser: UserProfile = {
   companyName: "PT Nusantara Digital",
   employmentStatus: "Karyawan tetap",
   joinDate: "8 Januari 2024",
-  workLocation: "Kantor Jakarta",
+  workLocation: "UNPAM Viktor 2",
 };
 
 const initialEmployees: EmployeeItem[] = [
@@ -194,11 +217,11 @@ const initialAdminLogs: AdminAttendanceLog[] = [
     position: "Product Designer",
     time: "07.52 WIB",
     date: "9 Nov 2026",
-    locationName: "Kantor Jakarta",
-    distanceMeters: 24,
+    locationName: "UNPAM Viktor 2 (Area Kampus)",
+    distanceMeters: 18,
     maxRadiusMeters: 100,
     isWithinRadius: true,
-    coordinates: "-6.2088, 106.8456",
+    coordinates: "-6.3457, 106.6918",
     status: "tepat_waktu",
   },
   {
@@ -208,11 +231,11 @@ const initialAdminLogs: AdminAttendanceLog[] = [
     position: "Frontend Developer",
     time: "07.45 WIB",
     date: "9 Nov 2026",
-    locationName: "Kantor Jakarta",
+    locationName: "UNPAM Viktor 2 (Gedung Barat)",
     distanceMeters: 35,
     maxRadiusMeters: 100,
     isWithinRadius: true,
-    coordinates: "-6.2089, 106.8454",
+    coordinates: "-6.3459, 106.6919",
     status: "tepat_waktu",
   },
   {
@@ -222,11 +245,11 @@ const initialAdminLogs: AdminAttendanceLog[] = [
     position: "Backend Engineer",
     time: "08.15 WIB",
     date: "9 Nov 2026",
-    locationName: "Jl. Gatot Subroto No. 44 (Luar Area)",
-    distanceMeters: 245,
+    locationName: "Jl. Raya Puspitek No. 12 (Luar Area)",
+    distanceMeters: 320,
     maxRadiusMeters: 100,
     isWithinRadius: false,
-    coordinates: "-6.2301, 106.8211",
+    coordinates: "-6.3486, 106.6938",
     status: "terlambat",
   },
   {
@@ -236,11 +259,11 @@ const initialAdminLogs: AdminAttendanceLog[] = [
     position: "UI/UX Researcher",
     time: "07.50 WIB",
     date: "9 Nov 2026",
-    locationName: "Kantor Jakarta",
-    distanceMeters: 18,
+    locationName: "UNPAM Viktor 2 (Lobby Utama)",
+    distanceMeters: 12,
     maxRadiusMeters: 100,
     isWithinRadius: true,
-    coordinates: "-6.2087, 106.8457",
+    coordinates: "-6.3458, 106.6917",
     status: "tepat_waktu",
   },
 ];
@@ -254,6 +277,7 @@ const initialAttendanceHistory: AttendanceRecord[] = [
     timeRange: "Belum presensi",
     status: "belum",
     statusLabel: "Hari ini",
+    location: "UNPAM Viktor 2",
   },
   {
     id: "att-06",
@@ -263,6 +287,7 @@ const initialAttendanceHistory: AttendanceRecord[] = [
     timeRange: "08.07 – 17.04",
     status: "terlambat",
     statusLabel: "Terlambat",
+    location: "UNPAM Viktor 2",
   },
   {
     id: "att-05",
@@ -272,6 +297,7 @@ const initialAttendanceHistory: AttendanceRecord[] = [
     timeRange: "07.48 – 17.02",
     status: "tepat_waktu",
     statusLabel: "Tepat waktu",
+    location: "UNPAM Viktor 2",
   },
   {
     id: "att-04",
@@ -281,6 +307,7 @@ const initialAttendanceHistory: AttendanceRecord[] = [
     timeRange: "Cuti tahunan",
     status: "cuti",
     statusLabel: "Disetujui",
+    location: "UNPAM Viktor 2",
   },
   {
     id: "att-03",
@@ -290,6 +317,7 @@ const initialAttendanceHistory: AttendanceRecord[] = [
     timeRange: "07.50 – 17.06",
     status: "tepat_waktu",
     statusLabel: "Tepat waktu",
+    location: "UNPAM Viktor 2",
   },
 ];
 
@@ -311,8 +339,12 @@ export function MobileAppProvider({ children }: { children: React.ReactNode }) {
   const [clockInTime, setClockInTime] = useState("07.52");
   const [attendanceHistory, setAttendanceHistory] = useState<AttendanceRecord[]>(initialAttendanceHistory);
 
-  // GPS State
+  // GPS & UNPAM Viktor 2 State
+  const [isGpsEnabled, setIsGpsEnabled] = useState(true);
   const [isInsideOffice, setIsInsideOffice] = useState(true);
+  const [userLat, setUserLat] = useState(-6.3457);
+  const [userLng, setUserLng] = useState(106.6918);
+  const [loginError, setLoginError] = useState<string | null>(null);
 
   // Leave Management
   const [remainingLeaveDays, setRemainingLeaveDays] = useState(8);
@@ -332,13 +364,26 @@ export function MobileAppProvider({ children }: { children: React.ReactNode }) {
   // Active preset tracker
   const [activePresetNumber, setActivePresetNumber] = useState(2);
 
+  // Calculate actual distance based on coordinates
+  const currentDistance = calculateHaversineDistance(
+    userLat,
+    userLng,
+    UNPAM_VIKTOR_LAT,
+    UNPAM_VIKTOR_LNG
+  );
+
   const gps: GPSStatus = {
-    isInsideOffice,
-    distanceMeters: isInsideOffice ? 24 : 245,
+    isGpsEnabled,
+    isInsideOffice: isGpsEnabled ? currentDistance <= 100 : false,
+    distanceMeters: isGpsEnabled ? currentDistance : 0,
     maxRadiusMeters: 100,
-    accuracyMeters: 5,
-    officeName: "Kantor Jakarta",
-    officeAddress: "Jl. Jend. Sudirman No. 28, Jakarta Selatan",
+    accuracyMeters: 3,
+    officeName: "UNPAM Viktor 2",
+    officeAddress: "Gedung Viktor 2, Universitas Pamulang, Jl. Puspitek No. 46, Serpong, Tangerang Selatan",
+    officeLat: UNPAM_VIKTOR_LAT,
+    officeLng: UNPAM_VIKTOR_LNG,
+    userLat,
+    userLng,
     currentTimeString: "07.52 WIB",
     currentDateString: "Senin, 9 Nov 2026",
   };
@@ -347,39 +392,138 @@ export function MobileAppProvider({ children }: { children: React.ReactNode }) {
   const terlambatCount = 1;
   const cutiCount = 1;
 
-  // Switch role between Karyawan and Admin HR
-  const switchRole = (role: UserRole) => {
-    setCurrentRole(role);
-    if (role === "admin") {
-      setCurrentView("admin_portal");
+  // Toggle GPS Sensor (On / Off)
+  const toggleGpsEnabled = (enabled: boolean) => {
+    setIsGpsEnabled(enabled);
+    if (!enabled) {
+      setLoginError("Sensor GPS dimatikan pada perangkat.");
     } else {
-      setCurrentView("main");
-      setActiveTab("beranda");
+      setLoginError(null);
     }
   };
 
-  // Toggle GPS inside vs outside office
+  // Toggle GPS inside vs outside UNPAM Viktor 2
   const toggleGpsLocation = (inside: boolean) => {
     setIsInsideOffice(inside);
+    if (inside) {
+      // Dekat Gedung Viktor 2 (~18 meter)
+      setUserLat(-6.3457);
+      setUserLng(106.6918);
+    } else {
+      // Di luar area kampus Viktor (~320 meter)
+      setUserLat(-6.3486);
+      setUserLng(106.6938);
+    }
+  };
+
+  // Request actual hardware/browser GPS coordinates
+  const requestRealBrowserGps = async (): Promise<{ success: boolean; message: string }> => {
+    if (typeof window === "undefined" || !navigator.geolocation) {
+      setIsGpsEnabled(false);
+      return { success: false, message: "Browser tidak mendukung sensor lokasi GPS." };
+    }
+
+    return new Promise((resolve) => {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setIsGpsEnabled(true);
+          const realLat = position.coords.latitude;
+          const realLng = position.coords.longitude;
+          setUserLat(realLat);
+          setUserLng(realLng);
+
+          const dist = calculateHaversineDistance(
+            realLat,
+            realLng,
+            UNPAM_VIKTOR_LAT,
+            UNPAM_VIKTOR_LNG
+          );
+
+          if (dist <= 100) {
+            setIsInsideOffice(true);
+            resolve({
+              success: true,
+              message: `GPS Aktif: Anda berada di dalam UNPAM Viktor 2 (${dist} meter).`,
+            });
+          } else {
+            setIsInsideOffice(false);
+            resolve({
+              success: false,
+              message: `GPS Aktif: Anda berada ${dist} meter dari UNPAM Viktor 2 (Di luar batas 100m).`,
+            });
+          }
+        },
+        (error) => {
+          setIsGpsEnabled(false);
+          let errMsg = "Izin akses lokasi GPS ditolak oleh pengguna.";
+          if (error.code === error.POSITION_UNAVAILABLE) errMsg = "Sinyal GPS tidak tersedia pada perangkat.";
+          if (error.code === error.TIMEOUT) errMsg = "Waktu deteksi GPS habis.";
+          setLoginError(errMsg);
+          resolve({ success: false, message: errMsg });
+        },
+        { enableHighAccuracy: true, timeout: 8000 }
+      );
+    });
+  };
+
+  // Strict Login at UNPAM Viktor 2
+  const login = (email?: string, password?: string) => {
+    setLoginError(null);
+
+    // Aturan 1: GPS HP harus aktif
+    if (!isGpsEnabled) {
+      const msg = "Akses Ditolak: Sensor GPS HP Anda belum aktif! Silakan nyalakan lokasi pada perangkat untuk memvalidasi posisi Anda di UNPAM Viktor 2.";
+      setLoginError(msg);
+      return { success: false, message: msg };
+    }
+
+    // Aturan 2: HP harus berada di dalam radius 100 meter UNPAM Viktor 2
+    if (!gps.isInsideOffice || gps.distanceMeters > 100) {
+      const msg = `Akses Login Ditolak! Anda terdeteksi berada di luar area UNPAM Viktor 2 (Jarak: ${gps.distanceMeters} m, batas maksimal: 100 m). Sesuai kebijakan keamanan, login karyawan hanya dapat dilakukan di dalam area kampus UNPAM Viktor 2.`;
+      setLoginError(msg);
+      return { success: false, message: msg };
+    }
+
+    // Validasi lolos
+    setIsLoggedIn(true);
+    setCurrentRole("karyawan");
+    setActiveTab("beranda");
+    setCurrentView("main");
+    setLoginError(null);
+    return { success: true, message: "Login berhasil di UNPAM Viktor 2" };
   };
 
   // Confirm Clock-In
   const confirmAttendance = () => {
-    if (!isInsideOffice) {
-      return { success: false, queued: false, message: "Di luar jangkauan kantor" };
+    // Validasi 1: GPS harus aktif
+    if (!isGpsEnabled) {
+      return {
+        success: false,
+        queued: false,
+        message: "Presensi Gagal: Sensor GPS HP tidak aktif! Silakan aktifkan izin lokasi perangkat Anda.",
+      };
+    }
+
+    // Validasi 2: Di dalam UNPAM Viktor 2 (≤ 100m)
+    if (!gps.isInsideOffice || gps.distanceMeters > 100) {
+      return {
+        success: false,
+        queued: false,
+        message: `Presensi Ditolak: Anda berada ${gps.distanceMeters} m di luar jangkauan UNPAM Viktor 2.`,
+      };
     }
 
     if (isOffline) {
       const queueItem: LocalQueueItem = {
         id: "queue-" + Date.now(),
         type: "attendance",
-        description: "Presensi masuk (07.52 WIB) - Offline",
+        description: `Presensi masuk UNPAM Viktor 2 (07.52 WIB) - Offline`,
         timestamp: new Date().toISOString(),
         payload: {
           time: "07.52",
           date: "9 November 2026",
-          location: "Kantor Jakarta",
-          distance: 24,
+          location: "UNPAM Viktor 2",
+          distance: gps.distanceMeters,
         },
       };
       setLocalQueue((prev) => [...prev, queueItem]);
@@ -397,12 +541,13 @@ export function MobileAppProvider({ children }: { children: React.ReactNode }) {
               timeRange: "07.52 – belum pulang",
               status: "tepat_waktu",
               statusLabel: "Hari ini",
+              location: "UNPAM Viktor 2",
             }
           : item
       )
     );
 
-    // Also push to Admin Live Logs
+    // Push to Admin Live Logs
     const newAdminLog: AdminAttendanceLog = {
       id: "log-" + Date.now(),
       employeeName: user.name,
@@ -410,17 +555,17 @@ export function MobileAppProvider({ children }: { children: React.ReactNode }) {
       position: user.division,
       time: "07.52 WIB",
       date: "9 Nov 2026",
-      locationName: "Kantor Jakarta",
-      distanceMeters: 24,
+      locationName: "UNPAM Viktor 2",
+      distanceMeters: gps.distanceMeters,
       maxRadiusMeters: 100,
       isWithinRadius: true,
-      coordinates: "-6.2088, 106.8456",
+      coordinates: `${userLat.toFixed(4)}, ${userLng.toFixed(4)}`,
       status: "tepat_waktu",
     };
     setAdminAttendanceLogs((prev) => [newAdminLog, ...prev]);
 
     setCurrentView("presensi_sukses");
-    return { success: true, queued: isOffline, message: "Presensi berhasil" };
+    return { success: true, queued: isOffline, message: "Presensi berhasil di UNPAM Viktor 2" };
   };
 
   // Submit Leave Request
@@ -467,7 +612,6 @@ export function MobileAppProvider({ children }: { children: React.ReactNode }) {
           : req
       )
     );
-    // If it's Aditya's request, decrement quota
     setRemainingLeaveDays((prev) => Math.max(0, prev - 1));
   };
 
@@ -516,29 +660,24 @@ export function MobileAppProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  // Auto-sync when coming back online
-  useEffect(() => {
-    if (!isOffline && localQueue.length > 0) {
-      const timer = setTimeout(() => {
-        syncLocalQueue();
-      }, 1200);
-      return () => clearTimeout(timer);
+  // Switch role between Karyawan and Admin HR
+  const switchRole = (role: UserRole) => {
+    setCurrentRole(role);
+    if (role === "admin") {
+      setCurrentView("admin_portal");
+    } else {
+      setCurrentView("main");
+      setActiveTab("beranda");
     }
-  }, [isOffline, localQueue.length]);
-
-  // Auth Helpers
-  const login = () => {
-    setIsLoggedIn(true);
-    setCurrentRole("karyawan");
-    setActiveTab("beranda");
-    setCurrentView("main");
   };
 
+  // Auth Helpers
   const loginAsAdmin = () => {
     setIsLoggedIn(true);
     setCurrentRole("admin");
     setAdminTab("cuti");
     setCurrentView("admin_portal");
+    setLoginError(null);
   };
 
   const loginAsKaryawan = () => {
@@ -546,11 +685,13 @@ export function MobileAppProvider({ children }: { children: React.ReactNode }) {
     setCurrentRole("karyawan");
     setActiveTab("beranda");
     setCurrentView("main");
+    setLoginError(null);
   };
 
   const logout = () => {
     setIsLoggedIn(false);
     setCurrentView("login");
+    setLoginError(null);
   };
 
   // Reset to default
@@ -560,7 +701,10 @@ export function MobileAppProvider({ children }: { children: React.ReactNode }) {
     setActiveTab("beranda");
     setCurrentView("main");
     setHasClockedIn(false);
+    setIsGpsEnabled(true);
     setIsInsideOffice(true);
+    setUserLat(-6.3457);
+    setUserLng(106.6918);
     setRemainingLeaveDays(8);
     setLatestLeaveRequest(null);
     setLocalQueue([]);
@@ -568,6 +712,7 @@ export function MobileAppProvider({ children }: { children: React.ReactNode }) {
     setAttendanceHistory(initialAttendanceHistory);
     setEmployees(initialEmployees);
     setLeaveRequests(initialLeaveRequests);
+    setLoginError(null);
     setActivePresetNumber(2);
   };
 
@@ -615,7 +760,9 @@ export function MobileAppProvider({ children }: { children: React.ReactNode }) {
         terlambatCount,
         cutiCount,
         gps,
+        toggleGpsEnabled,
         toggleGpsLocation,
+        requestRealBrowserGps,
         confirmAttendance,
         remainingLeaveDays,
         leaveRequests,
@@ -632,6 +779,8 @@ export function MobileAppProvider({ children }: { children: React.ReactNode }) {
         toggleOfflineMode,
         localQueue,
         syncLocalQueue,
+        loginError,
+        setLoginError,
         login,
         loginAsAdmin,
         loginAsKaryawan,

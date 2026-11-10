@@ -113,8 +113,8 @@ export function BerandaScreen() {
         <MapPin className="w-4 h-4 text-[#0D7A57] shrink-0" />
         <span>
           {hasClockedIn
-            ? "Masuk tercatat • Kantor Jakarta"
-            : "Kantor Jakarta • Radius presensi 100 m"}
+            ? "Masuk tercatat • UNPAM Viktor 2"
+            : "UNPAM Viktor 2 • Radius presensi 100 m"}
         </span>
       </div>
 

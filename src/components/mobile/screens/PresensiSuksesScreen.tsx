@@ -59,11 +59,11 @@ export function PresensiSuksesScreen() {
             </div>
             <div className="flex items-center justify-between">
               <span className="text-slate-500">Lokasi</span>
-              <span className="font-medium text-slate-800">Kantor Jakarta</span>
+              <span className="font-medium text-slate-800">UNPAM Viktor 2</span>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-slate-500">Validasi GPS</span>
-              <span className="font-medium text-slate-800">Dalam radius • 24 m</span>
+              <span className="font-medium text-slate-800">Dalam radius • 18 m</span>
             </div>
           </div>
         </div>

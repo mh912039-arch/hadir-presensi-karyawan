@@ -24,10 +24,10 @@ export function AdminAttendanceMonitor() {
         <Building2 className="w-5 h-5 text-[#0D7A57] shrink-0 mt-0.5" />
         <div className="space-y-0.5">
           <h4 className="text-xs font-bold text-[#0C2B22]">
-            Aturan Geo-fencing: Radius 100 Meter
+            Aturan Geo-fencing: Radius 100m UNPAM Viktor 2
           </h4>
           <p className="text-[11px] text-slate-600 leading-relaxed">
-            Titik pusat: Kantor Jakarta (Jl. Jend. Sudirman No. 28). Presensi sah hanya jika jarak GPS ≤ 100 meter.
+            Titik pusat: Kampus UNPAM Viktor (Gedung Viktor 2, Jl. Puspitek No. 46, Serpong). Presensi sah hanya jika jarak GPS ≤ 100 meter.
           </p>
         </div>
       </div>
