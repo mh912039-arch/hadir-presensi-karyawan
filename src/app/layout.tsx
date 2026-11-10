@@ -6,8 +6,8 @@ import { PwaRegister } from "@/components/mobile/PwaRegister";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "hadir. — HR & Presensi Karyawan",
-  description: "Sistem Informasi Kepegawaian & Presensi Karyawan PT Nusantara Digital",
+  title: "hadir. — HR & Presensi",
+  description: "Informasi kerja dan presensi Anda dalam satu genggaman.",
   manifest: "/manifest.json",
   icons: {
     icon: "/favicon.png",
@@ -15,7 +15,7 @@ export const metadata: Metadata = {
   },
   appleWebApp: {
     capable: true,
-    statusBarStyle: "black-translucent",
+    statusBarStyle: "default",
     title: "hadir.",
   },
 };
@@ -35,7 +35,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="id">
-      <body className={`${inter.className} min-h-screen bg-[#0E1318] antialiased selection:bg-[#0D7A57] selection:text-white`}>
+      <body className={`${inter.className} min-h-screen bg-[#F1F5F9] text-slate-900 antialiased selection:bg-[#0D7A57] selection:text-white`}>
         {children}
         <PwaRegister />
       </body>
