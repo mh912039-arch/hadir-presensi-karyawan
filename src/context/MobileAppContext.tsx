@@ -13,6 +13,8 @@ import {
   LocalQueueItem,
   EmployeeItem,
   AdminAttendanceLog,
+  AppNotification,
+  NotificationType,
 } from "@/types/mobile";
 
 interface MobileAppContextType {
@@ -55,6 +57,18 @@ interface MobileAppContextType {
   submitLeaveRequest: (leaveType: string, date: string, reason: string) => { success: boolean; queued: boolean };
   approveLeaveRequest: (id: string) => void;
   rejectLeaveRequest: (id: string) => void;
+
+  // In-App & Device Notifications
+  notifications: AppNotification[];
+  activeBannerNotification: AppNotification | null;
+  unreadNotificationCount: number;
+  isNotificationCenterOpen: boolean;
+  setIsNotificationCenterOpen: (open: boolean) => void;
+  dismissBannerNotification: () => void;
+  markNotificationAsRead: (id: string) => void;
+  markAllNotificationsAsRead: () => void;
+  clearNotifications: () => void;
+  requestNotificationPermission: () => Promise<boolean>;
 
   // Admin: Employee Management
   employees: EmployeeItem[];
@@ -324,6 +338,64 @@ const initialAttendanceHistory: AttendanceRecord[] = [
   },
 ];
 
+const initialNotifications: AppNotification[] = [
+  {
+    id: "notif-init-1",
+    recipientNip: "20240018",
+    title: "Sistem Presensi Siap",
+    message: "Validasi radius presensi kampus UNPAM Viktor 2 (100 meter) telah aktif.",
+    type: "system",
+    timestamp: "2026-11-09T07:30:00Z",
+    timeLabel: "07.30 WIB",
+    read: true,
+  },
+];
+
+function playNotificationTone(type: "approved" | "rejected" | "default" = "default") {
+  if (typeof window === "undefined") return;
+  try {
+    const AudioContextClass =
+      window.AudioContext ||
+      (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+    if (!AudioContextClass) return;
+    const ctx = new AudioContextClass();
+    const now = ctx.currentTime;
+
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    if (type === "approved") {
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(523.25, now);
+      osc.frequency.exponentialRampToValueAtTime(783.99, now + 0.14);
+      gain.gain.setValueAtTime(0.2, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+      osc.start(now);
+      osc.stop(now + 0.35);
+    } else if (type === "rejected") {
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(587.33, now);
+      osc.frequency.exponentialRampToValueAtTime(440.0, now + 0.16);
+      gain.gain.setValueAtTime(0.2, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+      osc.start(now);
+      osc.stop(now + 0.35);
+    } else {
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(659.25, now);
+      gain.gain.setValueAtTime(0.15, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+      osc.start(now);
+      osc.stop(now + 0.25);
+    }
+  } catch {
+    // Ignore audio permission/autoplay restrictions
+  }
+}
+
 const MobileAppContext = createContext<MobileAppContextType | undefined>(undefined);
 
 export function MobileAppProvider({ children }: { children: React.ReactNode }) {
@@ -337,6 +409,11 @@ export function MobileAppProvider({ children }: { children: React.ReactNode }) {
   // User & Active Account
   const [activeUserId, setActiveUserId] = useState<string>("emp-1");
   const [user, setUser] = useState<UserProfile>(defaultUser);
+
+  // In-App & Device Notifications
+  const [notifications, setNotifications] = useState<AppNotification[]>(initialNotifications);
+  const [activeBannerNotification, setActiveBannerNotification] = useState<AppNotification | null>(null);
+  const [isNotificationCenterOpen, setIsNotificationCenterOpen] = useState(false);
 
   // Attendance
   const [hasClockedIn, setHasClockedIn] = useState(false);
@@ -421,10 +498,23 @@ export function MobileAppProvider({ children }: { children: React.ReactNode }) {
         const parsed = JSON.parse(savedLogs);
         if (Array.isArray(parsed)) setAdminAttendanceLogs(parsed);
       }
+
+      const savedNotifications = localStorage.getItem("hadir_notifications");
+      if (savedNotifications) {
+        const parsed = JSON.parse(savedNotifications);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setNotifications(parsed);
+        }
+      }
     } catch (e) {
       console.error("Failed to load state from localStorage:", e);
     }
   }, []);
+
+  // Calculate unread notification count for the active employee
+  const unreadNotificationCount = notifications.filter(
+    (n) => !n.read && (n.recipientNip === user.nip || n.recipientNip === "all")
+  ).length;
 
   // Calculate actual distance based on coordinates
   const currentDistance = calculateHaversineDistance(
@@ -714,9 +804,12 @@ export function MobileAppProvider({ children }: { children: React.ReactNode }) {
     return { success: true, queued: isOffline };
   };
 
-  // Admin Approval: Approve Leave
+  // Admin Approval: Approve Leave & Trigger Notification to Employee Phone
   const approveLeaveRequest = (id: string) => {
+    let targetReq: LeaveRequest | undefined;
+
     setLeaveRequests((prev) => {
+      targetReq = prev.find((req) => req.id === id);
       const next = prev.map((req) =>
         req.id === id
           ? { ...req, status: "disetujui" as const, statusLabel: "Disetujui HR" }
@@ -729,12 +822,62 @@ export function MobileAppProvider({ children }: { children: React.ReactNode }) {
       }
       return next;
     });
+
     setRemainingLeaveDays((prev) => Math.max(0, prev - 1));
+
+    // Create Push Notification for the Employee
+    const notifTitle = "Pengajuan Cuti Disetujui";
+    const notifMessage = `Pengajuan ${targetReq?.leaveType || "Cuti"} Anda (${targetReq?.date || "13 November 2026"}) telah DISETUJUI oleh HR Manager. Kuota cuti berkurang 1 hari.`;
+
+    const newNotif: AppNotification = {
+      id: "notif-" + Date.now(),
+      recipientNip: targetReq ? targetReq.nip : user.nip,
+      title: notifTitle,
+      message: notifMessage,
+      type: "leave_approved",
+      timestamp: new Date().toISOString(),
+      timeLabel: "Baru saja",
+      read: false,
+      leaveRequestId: id,
+    };
+
+    setNotifications((prev) => {
+      const next = [newNotif, ...prev];
+      if (typeof window !== "undefined") {
+        try {
+          localStorage.setItem("hadir_notifications", JSON.stringify(next));
+        } catch (e) {}
+      }
+      return next;
+    });
+
+    // Display In-App Floating Push Notification Banner
+    setActiveBannerNotification(newNotif);
+
+    // Audio chime feedback
+    playNotificationTone("approved");
+
+    // Native Browser Push Notification
+    if (typeof window !== "undefined" && "Notification" in window) {
+      try {
+        if (Notification.permission === "granted") {
+          new Notification(`hadir. • ${notifTitle}`, {
+            body: notifMessage,
+            icon: "/icons/icon-192.png",
+          });
+        }
+      } catch (e) {
+        console.error("Browser notification error:", e);
+      }
+    }
   };
 
-  // Admin Approval: Reject Leave
+  // Admin Approval: Reject Leave & Trigger Notification to Employee Phone
   const rejectLeaveRequest = (id: string) => {
+    let targetReq: LeaveRequest | undefined;
+
     setLeaveRequests((prev) => {
+      targetReq = prev.find((req) => req.id === id);
       const next = prev.map((req) =>
         req.id === id
           ? { ...req, status: "ditolak" as const, statusLabel: "Ditolak HR" }
@@ -747,6 +890,107 @@ export function MobileAppProvider({ children }: { children: React.ReactNode }) {
       }
       return next;
     });
+
+    // Create Push Notification for the Employee
+    const notifTitle = "Pengajuan Cuti Ditolak";
+    const notifMessage = `Pengajuan ${targetReq?.leaveType || "Cuti"} Anda (${targetReq?.date || "13 November 2026"}) DITOLAK oleh HR Manager.`;
+
+    const newNotif: AppNotification = {
+      id: "notif-" + Date.now(),
+      recipientNip: targetReq ? targetReq.nip : user.nip,
+      title: notifTitle,
+      message: notifMessage,
+      type: "leave_rejected",
+      timestamp: new Date().toISOString(),
+      timeLabel: "Baru saja",
+      read: false,
+      leaveRequestId: id,
+    };
+
+    setNotifications((prev) => {
+      const next = [newNotif, ...prev];
+      if (typeof window !== "undefined") {
+        try {
+          localStorage.setItem("hadir_notifications", JSON.stringify(next));
+        } catch (e) {}
+      }
+      return next;
+    });
+
+    // Display In-App Floating Push Notification Banner
+    setActiveBannerNotification(newNotif);
+
+    // Audio chime feedback
+    playNotificationTone("rejected");
+
+    // Native Browser Push Notification
+    if (typeof window !== "undefined" && "Notification" in window) {
+      try {
+        if (Notification.permission === "granted") {
+          new Notification(`hadir. • ${notifTitle}`, {
+            body: notifMessage,
+            icon: "/icons/icon-192.png",
+          });
+        }
+      } catch (e) {
+        console.error("Browser notification error:", e);
+      }
+    }
+  };
+
+  // Notification action handlers
+  const dismissBannerNotification = () => {
+    setActiveBannerNotification(null);
+  };
+
+  const markNotificationAsRead = (id: string) => {
+    setNotifications((prev) => {
+      const next = prev.map((n) => (n.id === id ? { ...n, read: true } : n));
+      if (typeof window !== "undefined") {
+        try {
+          localStorage.setItem("hadir_notifications", JSON.stringify(next));
+        } catch (e) {}
+      }
+      return next;
+    });
+    if (activeBannerNotification?.id === id) {
+      setActiveBannerNotification(null);
+    }
+  };
+
+  const markAllNotificationsAsRead = () => {
+    setNotifications((prev) => {
+      const next = prev.map((n) => ({ ...n, read: true }));
+      if (typeof window !== "undefined") {
+        try {
+          localStorage.setItem("hadir_notifications", JSON.stringify(next));
+        } catch (e) {}
+      }
+      return next;
+    });
+    setActiveBannerNotification(null);
+  };
+
+  const clearNotifications = () => {
+    setNotifications([]);
+    setActiveBannerNotification(null);
+    if (typeof window !== "undefined") {
+      try {
+        localStorage.removeItem("hadir_notifications");
+      } catch (e) {}
+    }
+  };
+
+  const requestNotificationPermission = async (): Promise<boolean> => {
+    if (typeof window === "undefined" || !("Notification" in window)) {
+      return false;
+    }
+    try {
+      const permission = await Notification.requestPermission();
+      return permission === "granted";
+    } catch {
+      return false;
+    }
   };
 
   // Admin: Add Employee
@@ -965,6 +1209,7 @@ export function MobileAppProvider({ children }: { children: React.ReactNode }) {
         localStorage.removeItem("hadir_active_user_id");
         localStorage.removeItem("hadir_leave_requests");
         localStorage.removeItem("hadir_attendance_logs");
+        localStorage.removeItem("hadir_notifications");
       } catch (e) {}
     }
     setUser(defaultUser);
@@ -986,6 +1231,8 @@ export function MobileAppProvider({ children }: { children: React.ReactNode }) {
     setEmployees(initialEmployees);
     setLeaveRequests(initialLeaveRequests);
     setAdminAttendanceLogs(initialAdminLogs);
+    setNotifications(initialNotifications);
+    setActiveBannerNotification(null);
     setLoginError(null);
     setActivePresetNumber(2);
   };
@@ -1047,6 +1294,16 @@ export function MobileAppProvider({ children }: { children: React.ReactNode }) {
         submitLeaveRequest,
         approveLeaveRequest,
         rejectLeaveRequest,
+        notifications,
+        activeBannerNotification,
+        unreadNotificationCount,
+        isNotificationCenterOpen,
+        setIsNotificationCenterOpen,
+        dismissBannerNotification,
+        markNotificationAsRead,
+        markAllNotificationsAsRead,
+        clearNotifications,
+        requestNotificationPermission,
         employees,
         addEmployee,
         updateEmployee,

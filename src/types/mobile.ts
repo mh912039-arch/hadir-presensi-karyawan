@@ -106,3 +106,17 @@ export interface AdminAttendanceLog {
   coordinates: string;
   status: "tepat_waktu" | "terlambat";
 }
+
+export type NotificationType = "leave_approved" | "leave_rejected" | "system";
+
+export interface AppNotification {
+  id: string;
+  recipientNip: string;
+  title: string;
+  message: string;
+  type: NotificationType;
+  timestamp: string;
+  timeLabel: string;
+  read: boolean;
+  leaveRequestId?: string;
+}

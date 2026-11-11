@@ -13,6 +13,8 @@ import { PengajuanCutiScreen } from "@/components/mobile/screens/PengajuanCutiSc
 import { PengajuanSuksesScreen } from "@/components/mobile/screens/PengajuanSuksesScreen";
 import { ProfilScreen } from "@/components/mobile/screens/ProfilScreen";
 import { AdminPortalScreen } from "@/components/admin/AdminPortalScreen";
+import { MobileNotificationBanner } from "@/components/mobile/MobileNotificationBanner";
+import { NotificationModal } from "@/components/mobile/NotificationModal";
 
 export function HadirMobileApp() {
   const { isLoggedIn, activeTab, currentView, currentRole } = useMobileApp();
@@ -53,6 +55,8 @@ export function HadirMobileApp() {
   if (currentView === "pengajuan_cuti") {
     return (
       <div className="w-full flex-1 flex flex-col justify-between bg-[#F8FAF9] text-slate-900 select-none min-h-[100dvh]">
+        <MobileNotificationBanner />
+        <NotificationModal />
         <div className="flex-1 flex flex-col">
           <PengajuanCutiScreen />
         </div>
@@ -65,6 +69,8 @@ export function HadirMobileApp() {
   if (currentView === "pengajuan_sukses") {
     return (
       <div className="w-full flex-1 flex flex-col bg-[#F8FAF9] text-slate-900 select-none min-h-[100dvh]">
+        <MobileNotificationBanner />
+        <NotificationModal />
         <PengajuanSuksesScreen />
       </div>
     );
@@ -73,6 +79,9 @@ export function HadirMobileApp() {
   // 7. Main Tab Navigation Views (Karyawan)
   return (
     <div className="w-full flex-1 flex flex-col justify-between bg-[#F8FAF9] text-slate-900 select-none min-h-[100dvh]">
+      <MobileNotificationBanner />
+      <NotificationModal />
+
       <div className="flex-1 flex flex-col">
         {activeTab === "beranda" && (
           <>

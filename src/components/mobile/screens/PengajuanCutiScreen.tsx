@@ -1,12 +1,14 @@
 "use client";
 
 import React, { useState } from "react";
-import { ChevronLeft, ChevronDown, Calendar } from "lucide-react";
+import { ChevronLeft, ChevronDown, Calendar, CheckCircle2, XCircle, Clock } from "lucide-react";
 import { useMobileApp } from "@/context/MobileAppContext";
 
 export function PengajuanCutiScreen() {
   const {
+    user,
     remainingLeaveDays,
+    leaveRequests,
     submitLeaveRequest,
     setCurrentView,
     setActiveTab,
@@ -15,6 +17,10 @@ export function PengajuanCutiScreen() {
   const [leaveType, setLeaveType] = useState("Cuti tahunan");
   const [leaveDate, setLeaveDate] = useState("13 November 2026");
   const [reason, setReason] = useState("Keperluan keluarga.");
+
+  const myRequests = leaveRequests.filter(
+    (r) => r.nip === user.nip || r.employeeName === user.name
+  );
 
   const handleBack = () => {
     setActiveTab("beranda");
@@ -135,6 +141,66 @@ export function PengajuanCutiScreen() {
             </button>
           </div>
         </form>
+
+        {/* Riwayat Status Pengajuan Cuti Saya */}
+        {myRequests.length > 0 && (
+          <div className="pt-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
+                Status Pengajuan Cuti ({myRequests.length})
+              </h3>
+              <span className="text-[10px] text-slate-400">
+                Pembaruan otomatis dari HR
+              </span>
+            </div>
+
+            <div className="space-y-2">
+              {myRequests.map((req) => (
+                <div
+                  key={req.id}
+                  className="bg-white rounded-2xl p-3.5 border border-slate-100 shadow-2xs space-y-2"
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <h4 className="text-xs font-bold text-slate-900 leading-tight">
+                        {req.leaveType}
+                      </h4>
+                      <p className="text-[11px] text-slate-500 mt-0.5 flex items-center gap-1">
+                        <Calendar className="w-3 h-3 text-slate-400" />
+                        <span>{req.date} ({req.duration})</span>
+                      </p>
+                    </div>
+
+                    {req.status === "disetujui" && (
+                      <span className="px-2.5 py-1 text-[10px] font-bold text-[#0D7A57] bg-[#E8F6ED] border border-[#D5EEDC] rounded-lg shrink-0 flex items-center gap-1">
+                        <CheckCircle2 className="w-3 h-3" />
+                        <span>Disetujui HR</span>
+                      </span>
+                    )}
+
+                    {req.status === "ditolak" && (
+                      <span className="px-2.5 py-1 text-[10px] font-bold text-red-700 bg-red-50 border border-red-200/80 rounded-lg shrink-0 flex items-center gap-1">
+                        <XCircle className="w-3 h-3" />
+                        <span>Ditolak HR</span>
+                      </span>
+                    )}
+
+                    {req.status === "menunggu" && (
+                      <span className="px-2.5 py-1 text-[10px] font-bold text-amber-800 bg-amber-50 border border-amber-200/80 rounded-lg shrink-0 flex items-center gap-1">
+                        <Clock className="w-3 h-3" />
+                        <span>Menunggu HR</span>
+                      </span>
+                    )}
+                  </div>
+
+                  <p className="text-[11px] text-slate-600 bg-slate-50 rounded-xl p-2.5 italic">
+                    "{req.reason}"
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       <p className="text-center text-[11px] text-slate-400 pt-4">

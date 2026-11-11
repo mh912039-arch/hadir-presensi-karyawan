@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { MapPin, Calendar, FileText, ChevronRight } from "lucide-react";
+import { MapPin, Calendar, FileText, ChevronRight, CheckCircle2, XCircle, X } from "lucide-react";
 import { useMobileApp } from "@/context/MobileAppContext";
 
 export function BerandaScreen() {
@@ -13,7 +13,16 @@ export function BerandaScreen() {
     setCurrentView,
     setActiveTab,
     isOffline,
+    notifications,
+    markNotificationAsRead,
   } = useMobileApp();
+
+  const latestLeaveNotif = notifications.find(
+    (n) =>
+      !n.read &&
+      (n.recipientNip === user.nip || n.recipientNip === "all") &&
+      (n.type === "leave_approved" || n.type === "leave_rejected")
+  );
 
   const handlePresensiClick = () => {
     if (!hasClockedIn) {
@@ -55,6 +64,83 @@ export function BerandaScreen() {
           {user.role} • {user.division.startsWith("Divisi") ? user.division : `Divisi ${user.division}`}
         </p>
       </div>
+
+      {/* Leave Decision Notification Alert Card */}
+      {latestLeaveNotif && (
+        <div
+          className={`p-3.5 rounded-2xl border transition-all animate-in fade-in duration-200 space-y-2.5 ${
+            latestLeaveNotif.type === "leave_approved"
+              ? "bg-[#E8F6ED] border-[#D5EEDC]"
+              : "bg-red-50 border-red-200"
+          }`}
+        >
+          <div className="flex items-start justify-between gap-2">
+            <div className="flex items-start gap-2.5">
+              <div
+                className={`w-7 h-7 rounded-xl flex items-center justify-center shrink-0 mt-0.5 ${
+                  latestLeaveNotif.type === "leave_approved"
+                    ? "bg-white text-[#0D7A57] shadow-2xs"
+                    : "bg-white text-red-600 shadow-2xs"
+                }`}
+              >
+                {latestLeaveNotif.type === "leave_approved" ? (
+                  <CheckCircle2 className="w-4 h-4" strokeWidth={2.2} />
+                ) : (
+                  <XCircle className="w-4 h-4" strokeWidth={2.2} />
+                )}
+              </div>
+              <div className="space-y-0.5">
+                <span
+                  className={`text-[10px] font-extrabold uppercase tracking-wider block ${
+                    latestLeaveNotif.type === "leave_approved"
+                      ? "text-[#0D7A57]"
+                      : "text-red-700"
+                  }`}
+                >
+                  PEMBERITAHUAN HR
+                </span>
+                <h4 className="text-xs font-bold text-slate-900 leading-tight">
+                  {latestLeaveNotif.title}
+                </h4>
+                <p className="text-[11px] text-slate-600 leading-relaxed">
+                  {latestLeaveNotif.message}
+                </p>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => markNotificationAsRead(latestLeaveNotif.id)}
+              className="p-1 text-slate-400 hover:text-slate-700 rounded-lg shrink-0 cursor-pointer"
+              title="Tutup pemberitahuan"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          </div>
+
+          <div className="flex items-center justify-end gap-2 pt-1 border-t border-slate-200/50">
+            <button
+              type="button"
+              onClick={() => markNotificationAsRead(latestLeaveNotif.id)}
+              className="px-2.5 py-1 text-[11px] font-medium text-slate-500 hover:text-slate-800 cursor-pointer"
+            >
+              Tandai Dibaca
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                markNotificationAsRead(latestLeaveNotif.id);
+                setActiveTab("cuti");
+                setCurrentView("pengajuan_cuti");
+              }}
+              className="px-3 py-1 rounded-lg bg-[#0D7A57] text-white text-[11px] font-bold shadow-2xs hover:bg-[#0A6447] active:scale-95 flex items-center gap-1 cursor-pointer"
+            >
+              <span>Buka Menu Cuti</span>
+              <ChevronRight className="w-3 h-3" />
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Main Hero Card (Dark Forest Green) */}
       <div className="rounded-[26px] bg-[#0C2B22] p-5.5 text-white shadow-md border border-white/5 space-y-4">

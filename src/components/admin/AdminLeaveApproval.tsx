@@ -1,12 +1,14 @@
 "use client";
 
 import React, { useState } from "react";
-import { Check, X, Clock, Calendar, User } from "lucide-react";
+import { Check, X, Clock, Calendar, User, Bell } from "lucide-react";
 import { useMobileApp } from "@/context/MobileAppContext";
+import { LeaveRequest } from "@/types/mobile";
 
 export function AdminLeaveApproval() {
-  const { leaveRequests, approveLeaveRequest, rejectLeaveRequest } = useMobileApp();
+  const { leaveRequests, approveLeaveRequest, rejectLeaveRequest, switchRole } = useMobileApp();
   const [filter, setFilter] = useState<"all" | "menunggu" | "disetujui" | "ditolak">("all");
+  const [actionNotice, setActionNotice] = useState<string | null>(null);
 
   const pendingCount = leaveRequests.filter((r) => r.status === "menunggu").length;
   const approvedCount = leaveRequests.filter((r) => r.status === "disetujui").length;
@@ -17,8 +19,34 @@ export function AdminLeaveApproval() {
     return r.status === filter;
   });
 
+  const handleApprove = (req: LeaveRequest) => {
+    approveLeaveRequest(req.id);
+    setActionNotice(`Pengajuan cuti "${req.employeeName}" disetujui! Notifikasi otomatis terkirim ke HP karyawan.`);
+  };
+
+  const handleReject = (req: LeaveRequest) => {
+    rejectLeaveRequest(req.id);
+    setActionNotice(`Pengajuan cuti "${req.employeeName}" ditolak. Notifikasi otomatis terkirim ke HP karyawan.`);
+  };
+
   return (
     <div className="space-y-4">
+      {/* Live Notification Sent Notice */}
+      {actionNotice && (
+        <div className="p-3 bg-[#E8F6ED] border border-[#D5EEDC] rounded-2xl flex items-center justify-between text-xs text-[#0D7A57] animate-in fade-in duration-200">
+          <div className="flex items-center gap-2">
+            <Bell className="w-4 h-4 text-[#0D7A57] shrink-0" />
+            <span className="font-semibold">{actionNotice}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => switchRole("karyawan")}
+            className="px-2.5 py-1 bg-[#0D7A57] text-white rounded-lg text-[11px] font-bold shadow-2xs hover:bg-[#0A6447] active:scale-95 shrink-0 ml-2 cursor-pointer"
+          >
+            Lihat di HP
+          </button>
+        </div>
+      )}
       {/* Overview Stat Cards */}
       <div className="grid grid-cols-3 gap-2">
         <div className="bg-amber-50 border border-amber-200/80 rounded-2xl p-3 text-center">
@@ -156,7 +184,7 @@ export function AdminLeaveApproval() {
                 <div className="grid grid-cols-2 gap-2 pt-1">
                   <button
                     type="button"
-                    onClick={() => rejectLeaveRequest(req.id)}
+                    onClick={() => handleReject(req)}
                     className="h-9 px-3 rounded-xl border border-red-200 hover:bg-red-50 text-red-600 text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer active:scale-95"
                   >
                     <X className="w-4 h-4" />
@@ -164,7 +192,7 @@ export function AdminLeaveApproval() {
                   </button>
                   <button
                     type="button"
-                    onClick={() => approveLeaveRequest(req.id)}
+                    onClick={() => handleApprove(req)}
                     className="h-9 px-3 rounded-xl bg-[#0D7A57] hover:bg-[#0A6447] text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow-xs transition-all cursor-pointer active:scale-95"
                   >
                     <Check className="w-4 h-4" strokeWidth={2.5} />
