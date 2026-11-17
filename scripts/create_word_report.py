@@ -1,7 +1,7 @@
 import docx
 from docx.shared import Inches, Pt, RGBColor, Cm
-from docx.enum.text import WD_ALIGN_PARAGRAPH
-from docx.enum.table import WD_TABLE_ALIGNMENT, WD_ALIGN_VERTICAL
+from docx.enum.text import WD_ALIGN_PARAGRAPH, WD_TAB_ALIGNMENT, WD_TAB_LEADER
+from docx.enum.table import WD_TABLE_ALIGNMENT
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
 import os
@@ -14,7 +14,7 @@ def set_cell_background(cell, fill_hex):
     shd.set(qn('w:fill'), fill_hex)
     tcPr.append(shd)
 
-def set_cell_margins(cell, top=100, bottom=100, left=150, right=150):
+def set_cell_margins(cell, top=120, bottom=120, left=160, right=160):
     tcPr = cell._tc.get_or_add_tcPr()
     tcMar = OxmlElement('w:tcMar')
     for m, val in [('top', top), ('bottom', bottom), ('left', left), ('right', right)]:
@@ -24,7 +24,7 @@ def set_cell_margins(cell, top=100, bottom=100, left=150, right=150):
         tcMar.append(node)
     tcPr.append(tcMar)
 
-def set_table_borders(table, color="D3D3D3"):
+def set_table_borders(table, color="A0A0A0"):
     tblPr = table._tbl.tblPr
     tblBorders = OxmlElement('w:tblBorders')
     for border_name in ['top', 'left', 'bottom', 'right', 'insideH', 'insideV']:
@@ -55,7 +55,7 @@ def create_report():
     normal_style.paragraph_format.line_spacing = 1.5
     normal_style.paragraph_format.space_after = Pt(4)
 
-    # Helper functions
+    # Helper text functions
     def add_p(text, align=WD_ALIGN_PARAGRAPH.JUSTIFY, bold=False, italic=False, size=12, space_before=0, space_after=4):
         p = doc.add_paragraph()
         p.alignment = align
@@ -72,32 +72,32 @@ def create_report():
     def add_heading_1(title):
         p = doc.add_paragraph()
         p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-        p.paragraph_format.space_before = Pt(12)
-        p.paragraph_format.space_after = Pt(6)
+        p.paragraph_format.space_before = Pt(14)
+        p.paragraph_format.space_after = Pt(8)
         p.paragraph_format.keep_with_next = True
         run = p.add_run(title)
         run.bold = True
         run.font.name = 'Times New Roman'
-        run.font.size = Pt(14)
+        run.font.size = Pt(16)
         return p
 
     def add_heading_2(title):
         p = doc.add_paragraph()
         p.alignment = WD_ALIGN_PARAGRAPH.LEFT
-        p.paragraph_format.space_before = Pt(10)
+        p.paragraph_format.space_before = Pt(12)
         p.paragraph_format.space_after = Pt(4)
         p.paragraph_format.keep_with_next = True
         run = p.add_run(title)
         run.bold = True
         run.font.name = 'Times New Roman'
-        run.font.size = Pt(12)
+        run.font.size = Pt(13)
         return p
 
     def add_heading_3(title):
         p = doc.add_paragraph()
         p.alignment = WD_ALIGN_PARAGRAPH.LEFT
-        p.paragraph_format.space_before = Pt(6)
-        p.paragraph_format.space_after = Pt(2)
+        p.paragraph_format.space_before = Pt(8)
+        p.paragraph_format.space_after = Pt(3)
         p.paragraph_format.keep_with_next = True
         run = p.add_run(title)
         run.bold = True
@@ -105,16 +105,41 @@ def create_report():
         run.font.size = Pt(12)
         return p
 
+    def add_image_centered(img_path, width_cm=7.0):
+        if os.path.exists(img_path):
+            p = doc.add_paragraph()
+            p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            p.paragraph_format.space_before = Pt(8)
+            p.paragraph_format.space_after = Pt(4)
+            p.paragraph_format.keep_with_next = True
+            run = p.add_run()
+            run.add_picture(img_path, width=Cm(width_cm))
+            return p
+        else:
+            print("Warning: Image not found at", img_path)
+            return None
+
+    def add_caption(text):
+        p = doc.add_paragraph()
+        p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        p.paragraph_format.space_before = Pt(2)
+        p.paragraph_format.space_after = Pt(8)
+        run = p.add_run(text)
+        run.italic = True
+        run.font.name = 'Times New Roman'
+        run.font.size = Pt(11)
+        return p
+
     def style_table(table, col_widths, headers, data):
         table.alignment = WD_TABLE_ALIGNMENT.CENTER
-        set_table_borders(table, "B0B0B0")
+        set_table_borders(table, "A0A0A0")
         
         # Header Row
         hdr_cells = table.rows[0].cells
         for i, header_text in enumerate(headers):
             hdr_cells[i].text = header_text
-            set_cell_background(hdr_cells[i], "E8F0EC")
-            set_cell_margins(hdr_cells[i], top=120, bottom=120, left=140, right=140)
+            set_cell_background(hdr_cells[i], "E8F2EC")
+            set_cell_margins(hdr_cells[i], top=120, bottom=120, left=160, right=160)
             p = hdr_cells[i].paragraphs[0]
             p.alignment = WD_ALIGN_PARAGRAPH.CENTER
             p.paragraph_format.line_spacing = 1.15
@@ -122,26 +147,26 @@ def create_report():
             for r in p.runs:
                 r.bold = True
                 r.font.name = 'Times New Roman'
-                r.font.size = Pt(11)
+                r.font.size = Pt(11.5)
 
         # Data Rows
         for row_idx, row_data in enumerate(data):
             row_cells = table.rows[row_idx + 1].cells
-            bg_color = "FDFDFD" if row_idx % 2 == 0 else "F7FAF8"
+            bg_color = "FFFFFF" if row_idx % 2 == 0 else "F7FAF8"
             for col_idx, cell_value in enumerate(row_data):
                 row_cells[col_idx].text = str(cell_value)
                 set_cell_background(row_cells[col_idx], bg_color)
-                set_cell_margins(row_cells[col_idx], top=100, bottom=100, left=140, right=140)
+                set_cell_margins(row_cells[col_idx], top=110, bottom=110, left=160, right=160)
                 p = row_cells[col_idx].paragraphs[0]
                 p.paragraph_format.line_spacing = 1.15
                 p.paragraph_format.space_after = Pt(0)
-                if col_idx == 0 and len(cell_value) <= 5 and cell_value.isdigit():
+                if col_idx == 0 and len(str(cell_value)) <= 5 and str(cell_value).isdigit():
                     p.alignment = WD_ALIGN_PARAGRAPH.CENTER
                 else:
                     p.alignment = WD_ALIGN_PARAGRAPH.LEFT
                 for r in p.runs:
                     r.font.name = 'Times New Roman'
-                    r.font.size = Pt(10.5)
+                    r.font.size = Pt(11)
 
         # Widths
         for row in table.rows:
@@ -149,58 +174,83 @@ def create_report():
                 row.cells[idx].width = width
 
     # ================= COVER PAGE =================
-    add_p("LAPORAN PROYEK SISTEM INFORMASI MANAJEMEN", align=WD_ALIGN_PARAGRAPH.CENTER, bold=True, size=14, space_before=20, space_after=8)
-    add_p("PERANCANGAN SISTEM INFORMASI MANAJEMEN PRESENSI GPS DAN KEPEGAWAIAN KARYAWAN BERBASIS WEB MOBILE PADA PT NUSANTARA DIGITAL DENGAN METODE SDLC", align=WD_ALIGN_PARAGRAPH.CENTER, bold=True, size=13, space_before=4, space_after=36)
+    add_p("LAPORAN PROYEK SISTEM INFORMASI MANAJEMEN", align=WD_ALIGN_PARAGRAPH.CENTER, bold=True, size=15, space_before=16, space_after=8)
+    add_p("PERANCANGAN SISTEM INFORMASI MANAJEMEN PRESENSI GPS DAN KEPEGAWAIAN KARYAWAN BERBASIS WEB MOBILE PADA PT NUSANTARA DIGITAL DENGAN METODE SDLC", align=WD_ALIGN_PARAGRAPH.CENTER, bold=True, size=13.5, space_before=4, space_after=24)
 
-    add_p("[ LOGO UNIVERSITAS PAMULANG ]", align=WD_ALIGN_PARAGRAPH.CENTER, bold=True, italic=True, size=12, space_before=40, space_after=60)
+    logo_path = r"D:\TUGAS\SIM SMT5\docs\extracted_media\word\media\image1.png"
+    if os.path.exists(logo_path):
+        add_image_centered(logo_path, width_cm=4.2)
+    else:
+        add_p("[ LOGO UNIVERSITAS PAMULANG ]", align=WD_ALIGN_PARAGRAPH.CENTER, bold=True, italic=True, size=12, space_before=30, space_after=30)
 
-    add_p("Disusun oleh:", align=WD_ALIGN_PARAGRAPH.CENTER, bold=True, size=12, space_before=30, space_after=4)
-    add_p("Nama  : Aditya Pratama", align=WD_ALIGN_PARAGRAPH.CENTER, bold=False, size=12, space_after=2)
-    add_p("NIM   : 20240018", align=WD_ALIGN_PARAGRAPH.CENTER, bold=False, size=12, space_after=2)
-    add_p("Kelas : 05TPLP001", align=WD_ALIGN_PARAGRAPH.CENTER, bold=False, size=12, space_after=40)
+    p_mhs = doc.add_paragraph()
+    p_mhs.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    p_mhs.paragraph_format.space_before = Pt(24)
+    p_mhs.paragraph_format.space_after = Pt(28)
+    p_mhs.paragraph_format.line_spacing = 1.3
+    
+    r = p_mhs.add_run("Disusun oleh:\n")
+    r.bold = True
+    r.font.name = 'Times New Roman'
+    r.font.size = Pt(12.5)
+    
+    r = p_mhs.add_run("Nama  : Maulana Hasan Ibrahim\nNIM   : 241011402120\nKelas : 05TPLP013")
+    r.font.name = 'Times New Roman'
+    r.font.size = Pt(12)
 
-    add_p("PROGRAM STUDI TEKNIK INFORMATIKA\nFAKULTAS ILMU KOMPUTER\nUNIVERSITAS PAMULANG\nTAHUN 2026", align=WD_ALIGN_PARAGRAPH.CENTER, bold=True, size=13, space_before=20, space_after=0)
+    add_p("PROGRAM STUDI TEKNIK INFORMATIKA\nFAKULTAS ILMU KOMPUTER\nUNIVERSITAS PAMULANG\nTAHUN 2026", align=WD_ALIGN_PARAGRAPH.CENTER, bold=True, size=13.5, space_before=16, space_after=0)
     
     doc.add_page_break()
 
     # ================= DAFTAR ISI =================
     add_heading_1("DAFTAR ISI")
-    p_di = doc.add_paragraph()
-    p_di.paragraph_format.line_spacing = 1.3
-    items_di = [
-        ("BAB I PERENCANAAN SISTEM", "1"),
-        ("   1.1 Latar Belakang", "1"),
-        ("   1.2 Profil Organisasi", "1"),
-        ("   1.3 Rumusan Masalah", "2"),
-        ("   1.4 Tujuan dan Manfaat", "2"),
-        ("   1.5 Ruang Lingkup", "2"),
-        ("   1.6 Studi Kelayakan", "3"),
-        ("   1.7 Jadwal Proyek", "3"),
-        ("BAB II ANALISIS SISTEM", "4"),
-        ("   2.1 Metode Pengumpulan Data", "4"),
-        ("   2.2 Proses Bisnis yang Berjalan", "4"),
-        ("   2.3 Identifikasi Masalah", "5"),
-        ("   2.4 Pengguna dan Kebutuhan Informasi", "5"),
-        ("   2.5 Kebutuhan Fungsional", "6"),
-        ("   2.6 Kebutuhan Non-Fungsional", "6"),
-        ("   2.7 Jenis Sistem Informasi yang Dirancang", "7"),
-        ("BAB III DESAIN SISTEM", "8"),
-        ("   3.1 Gambaran Sistem Usulan dan Komponen SIM", "8"),
-        ("   3.2 Desain Proses", "9"),
-        ("   3.3 Desain Data", "10"),
-        ("   3.4 Desain Output (Laporan)", "12"),
-        ("   3.5 Desain Antarmuka (Mockup)", "13"),
+    
+    toc_items = [
+        ("BAB I PERENCANAAN SISTEM", "1", True, 0),
+        ("1.1 Latar Belakang", "1", False, 1),
+        ("1.2 Profil Organisasi", "1", False, 1),
+        ("1.3 Rumusan Masalah", "2", False, 1),
+        ("1.4 Tujuan dan Manfaat", "2", False, 1),
+        ("1.5 Ruang Lingkup", "2", False, 1),
+        ("1.6 Studi Kelayakan", "3", False, 1),
+        ("1.7 Jadwal Proyek", "3", False, 1),
+        ("BAB II ANALISIS SISTEM", "4", True, 0),
+        ("2.1 Metode Pengumpulan Data", "4", False, 1),
+        ("2.2 Proses Bisnis yang Berjalan", "4", False, 1),
+        ("2.3 Identifikasi Masalah", "5", False, 1),
+        ("2.4 Pengguna dan Kebutuhan Informasi", "5", False, 1),
+        ("2.5 Kebutuhan Fungsional", "6", False, 1),
+        ("2.6 Kebutuhan Non-Fungsional", "6", False, 1),
+        ("2.7 Jenis Sistem Informasi yang Dirancang", "7", False, 1),
+        ("BAB III DESAIN SISTEM", "8", True, 0),
+        ("3.1 Gambaran Sistem Usulan dan Komponen SIM", "8", False, 1),
+        ("3.2 Desain Proses", "9", False, 1),
+        ("3.3 Desain Data", "11", False, 1),
+        ("3.4 Desain Output (Laporan)", "13", False, 1),
+        ("3.5 Desain Antarmuka (Mockup)", "14", False, 1),
     ]
-    for text, pg in items_di:
+
+    for title, page_no, is_bold, indent_level in toc_items:
         p = doc.add_paragraph()
-        p.paragraph_format.line_spacing = 1.2
-        p.paragraph_format.space_after = Pt(2)
-        r1 = p.add_run(text)
-        r1.font.name = 'Times New Roman'
-        r1.font.size = Pt(11)
-        if text.startswith("BAB"):
-            r1.bold = True
-            
+        p.paragraph_format.line_spacing = 1.3
+        p.paragraph_format.space_after = Pt(3)
+        p.paragraph_format.space_before = Pt(4 if is_bold else 0)
+        
+        # Add tab stop with leader dots at 14.0 cm (right aligned)
+        tab_stops = p.paragraph_format.tab_stops
+        tab_stops.add_tab_stop(Cm(14.0), WD_TAB_ALIGNMENT.RIGHT, WD_TAB_LEADER.DOTS)
+        
+        prefix = "   " * indent_level
+        run1 = p.add_run(f"{prefix}{title}\t")
+        run1.font.name = 'Times New Roman'
+        run1.font.size = Pt(12.5 if is_bold else 12)
+        run1.bold = is_bold
+        
+        run2 = p.add_run(page_no)
+        run2.font.name = 'Times New Roman'
+        run2.font.size = Pt(12.5 if is_bold else 12)
+        run2.bold = is_bold
+
     doc.add_page_break()
 
     # ================= BAB I =================
@@ -212,7 +262,7 @@ def create_report():
     add_p("Untuk mengatasi permasalahan tersebut, dirancang Sistem Informasi Manajemen Presensi dan Kepegawaian berbasis Web Mobile / Progressive Web App (PWA) bernama hadir.. Sistem ini mengintegrasikan verifikasi koordinat GPS (geo-fencing) dengan batas radius 100 meter di UNPAM Viktor 2, modul persetujuan cuti digital secara real-time, dan dasbor pemantauan terpusat bagi manajemen.")
 
     add_heading_2("1.2 Profil Organisasi")
-    add_p("Tabel 1.1 Profil Organisasi", bold=True, size=11, space_after=2)
+    add_p("Tabel 1.1 Profil Organisasi", bold=True, size=11.5, space_after=3)
     tbl_1_1 = doc.add_table(rows=7, cols=2)
     col_w_1_1 = [Cm(5), Cm(10)]
     headers_1_1 = ["Aspek", "Keterangan"]
@@ -257,7 +307,7 @@ def create_report():
     add_p("3. Pengelolaan potongan pajak penghasilan (PPh 21) dan jaminan ketenagakerjaan.")
 
     add_heading_2("1.6 Studi Kelayakan")
-    add_p("Tabel 1.2 Hasil Penilaian Studi Kelayakan", bold=True, size=11, space_after=2)
+    add_p("Tabel 1.2 Hasil Penilaian Studi Kelayakan", bold=True, size=11.5, space_after=3)
     tbl_1_2 = doc.add_table(rows=5, cols=3)
     col_w_1_2 = [Cm(3.5), Cm(5.5), Cm(6.5)]
     headers_1_2 = ["Aspek", "Pertanyaan", "Hasil Penilaian"]
@@ -270,7 +320,7 @@ def create_report():
     style_table(tbl_1_2, col_w_1_2, headers_1_2, data_1_2)
 
     add_heading_2("1.7 Jadwal Proyek")
-    add_p("Tabel 1.3 Jadwal Pelaksanaan Proyek (SDLC)", bold=True, size=11, space_after=2)
+    add_p("Tabel 1.3 Jadwal Pelaksanaan Proyek (SDLC)", bold=True, size=11.5, space_after=3)
     tbl_1_3 = doc.add_table(rows=6, cols=6)
     col_w_1_3 = [Cm(6.5), Cm(1.8), Cm(1.8), Cm(1.8), Cm(1.8), Cm(1.8)]
     headers_1_3 = ["Tahap SDLC", "P9", "P10", "P11", "P12", "P13"]
@@ -301,11 +351,12 @@ def create_report():
     add_p("4. Rekapitulasi Bulanan: Setiap akhir bulan, Admin HR memindahkan data tanda tangan fisik ke dalam lembar kerja Microsoft Excel, yang membutuhkan waktu 3 hingga 5 hari kerja dan rawan human error.")
 
     add_heading_3("2.2.2 Flowchart Sistem yang Berjalan")
-    add_p("Gambar 2.1 Flowchart Sistem Presensi dan Pengajuan Cuti yang Sedang Berjalan", italic=True, size=11, space_before=4, space_after=6)
-    add_p("[Alur Kerja Manual: Karyawan Datang -> Tanda Tangan Buku Absen Fisik -> Isi Formulir Kertas / WhatsApp -> HR Memeriksa Sisa Cuti di Buku Arsip -> Disetujui/Ditolak Manual -> Akhir Bulan Rekapitulasi ke Lembar Kerja Excel]", italic=True, size=11)
+    diag_flowchart = r"D:\TUGAS\SIM SMT5\docs\diagram_images\flowchart_berjalan.png"
+    add_image_centered(diag_flowchart, width_cm=13.5)
+    add_caption("Gambar 2.1 Flowchart Sistem Presensi dan Pengajuan Cuti yang Sedang Berjalan")
 
     add_heading_2("2.3 Identifikasi Masalah")
-    add_p("Tabel 2.1 Matriks Identifikasi Masalah", bold=True, size=11, space_after=2)
+    add_p("Tabel 2.1 Matriks Identifikasi Masalah", bold=True, size=11.5, space_after=3)
     tbl_2_1 = doc.add_table(rows=5, cols=4)
     col_w_2_1 = [Cm(1.2), Cm(4.5), Cm(4.5), Cm(5.3)]
     headers_2_1 = ["No", "Masalah", "Penyebab", "Dampak"]
@@ -318,7 +369,7 @@ def create_report():
     style_table(tbl_2_1, col_w_2_1, headers_2_1, data_2_1)
 
     add_heading_2("2.4 Pengguna dan Kebutuhan Informasi")
-    add_p("Tabel 2.2 Kebutuhan Informasi Berdasarkan Tingkatan Manajemen (Materi P4)", bold=True, size=11, space_after=2)
+    add_p("Tabel 2.2 Kebutuhan Informasi Berdasarkan Tingkatan Manajemen (Materi P4)", bold=True, size=11.5, space_after=3)
     tbl_2_2 = doc.add_table(rows=4, cols=4)
     col_w_2_2 = [Cm(3.5), Cm(3.5), Cm(5.5), Cm(3.0)]
     headers_2_2 = ["Pengguna / Peran", "Tingkatan Manajemen", "Informasi yang Dibutuhkan", "Frekuensi"]
@@ -330,7 +381,7 @@ def create_report():
     style_table(tbl_2_2, col_w_2_2, headers_2_2, data_2_2)
 
     add_heading_2("2.5 Kebutuhan Fungsional")
-    add_p("Tabel 2.3 Daftar Kebutuhan Fungsional (Functional Requirements)", bold=True, size=11, space_after=2)
+    add_p("Tabel 2.3 Daftar Kebutuhan Fungsional (Functional Requirements)", bold=True, size=11.5, space_after=3)
     tbl_2_3 = doc.add_table(rows=9, cols=3)
     col_w_2_3 = [Cm(2.0), Cm(9.5), Cm(4.0)]
     headers_2_3 = ["Kode", "Kebutuhan Fungsional", "Pengguna"]
@@ -347,7 +398,7 @@ def create_report():
     style_table(tbl_2_3, col_w_2_3, headers_2_3, data_2_3)
 
     add_heading_2("2.6 Kebutuhan Non-Fungsional")
-    add_p("Tabel 2.4 Daftar Kebutuhan Non-Fungsional (Non-Functional Requirements)", bold=True, size=11, space_after=2)
+    add_p("Tabel 2.4 Daftar Kebutuhan Non-Fungsional (Non-Functional Requirements)", bold=True, size=11.5, space_after=3)
     tbl_2_4 = doc.add_table(rows=5, cols=3)
     col_w_2_4 = [Cm(2.0), Cm(4.0), Cm(9.5)]
     headers_2_4 = ["Kode", "Aspek", "Kebutuhan Non-Fungsional"]
@@ -360,7 +411,7 @@ def create_report():
     style_table(tbl_2_4, col_w_2_4, headers_2_4, data_2_4)
 
     add_heading_2("2.7 Jenis Sistem Informasi yang Dirancang")
-    add_p("Tabel 2.5 Pemetaan Jenis Sistem Informasi (Materi P6)", bold=True, size=11, space_after=2)
+    add_p("Tabel 2.5 Pemetaan Jenis Sistem Informasi (Materi P6)", bold=True, size=11.5, space_after=3)
     tbl_2_5 = doc.add_table(rows=5, cols=3)
     col_w_2_5 = [Cm(3.5), Cm(8.0), Cm(4.0)]
     headers_2_5 = ["Jenis SI", "Bagian Sistem yang Dirancang", "Pengguna"]
@@ -383,7 +434,7 @@ def create_report():
     add_p("Jika karyawan berada dalam batas radius aman 100 meter dan GPS aktif, presensi dapat dikonfirmasi dalam satu sentuhan. Untuk pengajuan cuti, karyawan mengisi data pada formulir digital, lalu notifikasi langsung masuk ke dasbor Admin HR untuk disetujui atau ditolak secara real-time. Hasil persetujuan akan langsung memicu notifikasi visual dan nada audio chime pada ponsel karyawan yang bersangkutan.")
 
     add_heading_3("3.1.2 Enam Komponen SIM Usulan")
-    add_p("Tabel 3.1 Komponen SIM Usulan (Materi P2)", bold=True, size=11, space_after=2)
+    add_p("Tabel 3.1 Komponen SIM Usulan (Materi P2)", bold=True, size=11.5, space_after=3)
     tbl_3_1 = doc.add_table(rows=7, cols=2)
     col_w_3_1 = [Cm(4.5), Cm(11.0)]
     headers_3_1 = ["Komponen SIM", "Wujud pada Sistem Usulan"]
@@ -399,21 +450,24 @@ def create_report():
 
     add_heading_2("3.2 Desain Proses")
     add_heading_3("3.2.1 Diagram Konteks (DFD Level 0)")
-    add_p("Gambar 3.1 Diagram Konteks (DFD Level 0) Sistem Informasi hadir.", italic=True, size=11, space_before=4, space_after=6)
-    add_p("[Diagram Konteks: Entitas Karyawan dan Admin HR berinteraksi dengan Sistem Informasi Presensi dan Kepegawaian (hadir.). Karyawan mengirimkan data koordinat GPS, kredensial, dan pengajuan cuti; menerima status kehadiran dan notifikasi cuti. Admin HR mengirimkan keputusan cuti dan kelola data; menerima log audit GPS dan laporan kehadiran.]", italic=True, size=11)
+    diag_dfd0 = r"D:\TUGAS\SIM SMT5\docs\diagram_images\dfd_level_0.png"
+    add_image_centered(diag_dfd0, width_cm=13.5)
+    add_caption("Gambar 3.1 Diagram Konteks (DFD Level 0) Sistem Informasi hadir.")
 
     add_heading_3("3.2.2 DFD Level 1 (Dekomposisi Proses)")
-    add_p("Gambar 3.2 DFD Level 1 Sistem Informasi hadir.", italic=True, size=11, space_before=4, space_after=6)
-    add_p("[DFD Level 1 membagi sistem menjadi 4 proses utama: (1.0 Autentikasi Pengguna) terhubung ke data store D1: Profil Karyawan; (2.0 Presensi GPS) menyimpan transaksi ke D2: Log Presensi GPS; (3.0 Pengajuan & Persetujuan Cuti) mengelola data pada D3: Pengajuan Cuti; dan (4.0 Kelola Pegawai & Pelaporan Eksekutif) mengolah data menjadi laporan MIS/DSS.]", italic=True, size=11)
+    diag_dfd1 = r"D:\TUGAS\SIM SMT5\docs\diagram_images\dfd_level_1.png"
+    add_image_centered(diag_dfd1, width_cm=13.5)
+    add_caption("Gambar 3.2 DFD Level 1 / Flowchart Sistem Usulan hadir.")
 
     add_heading_2("3.3 Desain Data")
     add_heading_3("3.3.1 Entity Relationship Diagram (ERD)")
-    add_p("Gambar 3.3 Entity Relationship Diagram (ERD) Sistem Informasi hadir.", italic=True, size=11, space_before=4, space_after=6)
-    add_p("[ERD terdiri dari 4 entitas utama: KARYAWAN (1:M ke ATTENDANCE_LOGS dan 1:M ke LEAVE_REQUESTS), OFFICE_LOCATIONS (1:M ke ATTENDANCE_LOGS) yang menetapkan batas koordinat dan radius kampus UNPAM Viktor 2.]", italic=True, size=11)
+    diag_erd = r"D:\TUGAS\SIM SMT5\docs\diagram_images\erd_diagram.png"
+    add_image_centered(diag_erd, width_cm=13.5)
+    add_caption("Gambar 3.3 Entity Relationship Diagram (ERD) Sistem Informasi hadir.")
 
     add_heading_3("3.3.2 Kamus Data (Data Dictionary)")
     
-    add_p("Tabel 3.2 Kamus Data Tabel karyawan (user_profiles)", bold=True, size=11, space_after=2)
+    add_p("Tabel 3.2 Kamus Data Tabel karyawan (user_profiles)", bold=True, size=11.5, space_after=3)
     tbl_3_2 = doc.add_table(rows=9, cols=4)
     col_w_3_2 = [Cm(3.5), Cm(2.5), Cm(2.0), Cm(7.5)]
     headers_3_2 = ["Nama Field", "Tipe Data", "Panjang", "Keterangan"]
@@ -429,7 +483,7 @@ def create_report():
     ]
     style_table(tbl_3_2, col_w_3_2, headers_3_2, data_3_2)
 
-    add_p("Tabel 3.3 Kamus Data Tabel attendance_logs", bold=True, size=11, space_before=8, space_after=2)
+    add_p("Tabel 3.3 Kamus Data Tabel attendance_logs", bold=True, size=11.5, space_before=8, space_after=3)
     tbl_3_3 = doc.add_table(rows=10, cols=4)
     col_w_3_3 = [Cm(3.5), Cm(2.5), Cm(2.0), Cm(7.5)]
     headers_3_3 = ["Nama Field", "Tipe Data", "Panjang", "Keterangan"]
@@ -446,7 +500,7 @@ def create_report():
     ]
     style_table(tbl_3_3, col_w_3_3, headers_3_3, data_3_3)
 
-    add_p("Tabel 3.4 Kamus Data Tabel leave_requests", bold=True, size=11, space_before=8, space_after=2)
+    add_p("Tabel 3.4 Kamus Data Tabel leave_requests", bold=True, size=11.5, space_before=8, space_after=3)
     tbl_3_4 = doc.add_table(rows=10, cols=4)
     col_w_3_4 = [Cm(3.5), Cm(2.5), Cm(2.0), Cm(7.5)]
     headers_3_4 = ["Nama Field", "Tipe Data", "Panjang", "Keterangan"]
@@ -463,7 +517,7 @@ def create_report():
     ]
     style_table(tbl_3_4, col_w_3_4, headers_3_4, data_3_4)
 
-    add_p("Tabel 3.5 Kamus Data Tabel office_locations", bold=True, size=11, space_before=8, space_after=2)
+    add_p("Tabel 3.5 Kamus Data Tabel office_locations", bold=True, size=11.5, space_before=8, space_after=3)
     tbl_3_5 = doc.add_table(rows=6, cols=4)
     col_w_3_5 = [Cm(3.5), Cm(2.5), Cm(2.0), Cm(7.5)]
     headers_3_5 = ["Nama Field", "Tipe Data", "Panjang", "Keterangan"]
@@ -477,7 +531,7 @@ def create_report():
     style_table(tbl_3_5, col_w_3_5, headers_3_5, data_3_5)
 
     add_heading_2("3.4 Desain Output (Laporan)")
-    add_p("Tabel 3.6 Rancangan Output Laporan Sistem", bold=True, size=11, space_after=2)
+    add_p("Tabel 3.6 Rancangan Output Laporan Sistem", bold=True, size=11.5, space_after=3)
     tbl_3_6 = doc.add_table(rows=4, cols=4)
     col_w_3_6 = [Cm(3.5), Cm(3.0), Cm(6.5), Cm(2.5)]
     headers_3_6 = ["Nama Laporan", "Pengguna", "Isi / Kolom Laporan", "Periode"]
@@ -490,35 +544,43 @@ def create_report():
 
     add_heading_2("3.5 Desain Antarmuka (Mockup)")
     
-    add_heading_3("1. Layar Login & Pemilihan Peran (F-01, NF-01)")
-    add_p("Fungsi Layar: Menyediakan gerbang masuk terpadu dengan input email/NIP, kata sandi, pemilihan segmen peran (Karyawan atau Admin), serta verifikasi koordinat GPS ponsel secara otomatis.")
-    add_p("Kebutuhan yang Dipenuhi: Memenuhi kebutuhan fungsional F-01 dan non-fungsional NF-01.")
-    add_p("Gambar 3.4 Mockup Layar Login dan Pemilihan Peran", italic=True, size=10.5)
+    mockup_dir = r"D:\TUGAS\SIM SMT5\prototype_design"
+    
+    # 1. Layar Login
+    img_login = os.path.join(mockup_dir, "01 - Masuk.png")
+    add_image_centered(img_login, width_cm=7.0)
+    add_caption("Gambar 3.4 Mockup Layar Login")
+    add_p("Fungsi layar: Menyediakan gerbang masuk terpadu dengan input email/NIP, kata sandi, pemilihan segmen peran (Karyawan atau Admin), serta verifikasi koordinat GPS ponsel secara otomatis. • Memenuhi kebutuhan: F-01, NF-01.", italic=False, size=11.5)
 
-    add_heading_3("2. Layar Dashboard Beranda Karyawan (F-03, F-04, OAS)")
-    add_p("Fungsi Layar: Menampilkan identitas profil staf aktif, kartu status presensi hari ini, indikator radius UNPAM Viktor 2, sisa jatah kuota cuti tahunan, serta akses cepat ke menu presensi dan pengajuan cuti.")
-    add_p("Kebutuhan yang Dipenuhi: Memenuhi kebutuhan fungsional F-03, F-04, dan arketipe sistem OAS.")
-    add_p("Gambar 3.5 Mockup Layar Dashboard Beranda Karyawan", italic=True, size=10.5)
+    # 2. Layar Dashboard sesuai peran
+    img_beranda = os.path.join(mockup_dir, "02 - Beranda.png")
+    add_image_centered(img_beranda, width_cm=7.0)
+    add_caption("Gambar 3.5 Mockup Layar Dashboard sesuai peran")
+    add_p("Fungsi layar: Menampilkan identitas profil staf aktif, kartu status presensi hari ini, indikator radius UNPAM Viktor 2, sisa jatah kuota cuti tahunan, serta akses cepat ke menu presensi dan pengajuan cuti. • Memenuhi kebutuhan: F-03, F-04, OAS.", italic=False, size=11.5)
 
-    add_heading_3("3. Layar Presensi GPS & Peta Geo-fencing (F-02, F-03, TPS)")
-    add_p("Fungsi Layar: Memetakan lokasi fisik pengguna terhadap titik pusat UNPAM Viktor 2 secara grafis, menampilkan indikator jarak riil meter, dan tombol eksekusi kehadiran yang hanya aktif bila GPS berada dalam radius <= 100 meter.")
-    add_p("Kebutuhan yang Dipenuhi: Memenuhi kebutuhan fungsional F-02, F-03, dan komponen TPS.")
-    add_p("Gambar 3.6 Mockup Layar Presensi GPS dan Geo-fencing", italic=True, size=10.5)
+    # 3. Layar Form input transaksi (TPS)
+    img_gps = os.path.join(mockup_dir, "03 - Presensi GPS.png")
+    add_image_centered(img_gps, width_cm=7.0)
+    add_caption("Gambar 3.6 Mockup Layar Form input transaksi (TPS)")
+    add_p("Fungsi layar: Memetakan lokasi fisik pengguna terhadap titik pusat UNPAM Viktor 2 secara grafis, menampilkan indikator jarak riil meter, dan tombol eksekusi kehadiran yang hanya aktif bila GPS berada dalam radius <= 100 meter. • Memenuhi kebutuhan: F-02, F-03, TPS.", italic=False, size=11.5)
 
-    add_heading_3("4. Layar Formulir Pengajuan Cuti Karyawan (F-04, TPS, OAS)")
-    add_p("Fungsi Layar: Mengakomodasi formulir permohonan cuti mandiri secara digital tanpa kertas, meliputi pemilihan tipe cuti, tanggal rencana izin, durasi hari, dan penjelasan keperluan.")
-    add_p("Kebutuhan yang Dipenuhi: Memenuhi kebutuhan fungsional F-04, komponen TPS, dan OAS.")
-    add_p("Gambar 3.7 Mockup Layar Formulir Pengajuan Cuti Karyawan", italic=True, size=10.5)
+    # 4. Layar Daftar / pencarian data
+    img_riwayat = os.path.join(mockup_dir, "07 - Riwayat kehadiran.png")
+    add_image_centered(img_riwayat, width_cm=7.0)
+    add_caption("Gambar 3.7 Mockup Layar Daftar / pencarian data")
+    add_p("Fungsi layar: Menyajikan daftar riwayat kehadiran karyawan secara berurutan berdasarkan tanggal, jam masuk, jam pulang, dan status kedatangan (tepat waktu, terlambat, atau cuti) beserta pencarian riwayat presensi. • Memenuhi kebutuhan: F-03, F-08, MIS.", italic=False, size=11.5)
 
-    add_heading_3("5. Layar Persetujuan Cuti & Notifikasi Admin HR (F-05, F-06, MIS)")
-    add_p("Fungsi Layar: Panel kerja bagi Admin HR untuk mereview daftar pengajuan cuti yang masuk, memeriksa detail alasan staf, serta mengeksekusi tombol persetujuan atau penolakan yang otomatis memicu notifikasi ke perangkat karyawan.")
-    add_p("Kebutuhan yang Dipenuhi: Memenuhi kebutuhan fungsional F-05, F-06, dan komponen MIS.")
-    add_p("Gambar 3.8 Mockup Layar Persetujuan Cuti Admin HR", italic=True, size=10.5)
+    # 5. Layar Laporan untuk manajer (MIS)
+    img_cuti = os.path.join(mockup_dir, "08 - Pengajuan cuti.png")
+    add_image_centered(img_cuti, width_cm=7.0)
+    add_caption("Gambar 3.8 Mockup Layar Laporan untuk manajer (MIS)")
+    add_p("Fungsi layar: Panel formulir dan verifikasi pengajuan cuti kerja karyawan bagi Admin HR/Manajer untuk memeriksa alasan staf, jenis cuti, serta mengeksekusi persetujuan atau penolakan cuti secara real-time. • Memenuhi kebutuhan: F-04, F-05, F-06, MIS.", italic=False, size=11.5)
 
-    add_heading_3("6. Layar Pemantauan Log GPS & Kelola Karyawan (F-07, F-08, DSS/ESS)")
-    add_p("Fungsi Layar: Menyajikan log audit presensi GPS harian (mencakup waktu, jarak meter, status radius, dan koordinat satelit) serta panel administrasi data master akun karyawan.")
-    add_p("Kebutuhan yang Dipenuhi: Memenuhi kebutuhan fungsional F-07, F-08, dan komponen DSS/ESS.")
-    add_p("Gambar 3.9 Mockup Layar Monitoring Presensi GPS dan Kelola Pegawai", italic=True, size=10.5)
+    # 6. Layar Dashboard pimpinan (ESS/DSS)
+    img_sukses = os.path.join(mockup_dir, "05 - Presensi berhasil.png")
+    add_image_centered(img_sukses, width_cm=7.0)
+    add_caption("Gambar 3.9 Mockup Layar Dashboard pimpinan (ESS/DSS)")
+    add_p("Fungsi layar: Menyajikan dasbor konfirmasi dan ringkasan eksekutif pemantauan kepatuhan lokasi presensi GPS karyawan, catatan jam kerja, serta validitas kehadiran secara terpadu. • Memenuhi kebutuhan: F-07, F-08, DSS/ESS.", italic=False, size=11.5)
 
     # Output paths
     output_docs = r"D:\TUGAS\SIM SMT5\docs\LAPORAN_PROYEK_SIM_BAB_1_SAMPAI_3.docx"
@@ -529,7 +591,7 @@ def create_report():
 
     doc.save(output_docs)
     doc.save(output_public)
-    print(f"Successfully saved to:\n1. {output_docs}\n2. {output_public}")
+    print(f"Successfully updated and saved with images to:\n1. {output_docs}\n2. {output_public}")
 
 if __name__ == "__main__":
     create_report()
