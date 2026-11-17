@@ -20,7 +20,7 @@ export function HadirMobileApp() {
   const { isLoggedIn, activeTab, currentView, currentRole } = useMobileApp();
 
   // 1. Admin Portal Flow (Full Admin HR Interface)
-  if (currentRole === "admin" || currentView === "admin_portal") {
+  if (isLoggedIn && (currentRole === "admin" || currentView === "admin_portal")) {
     return <AdminPortalScreen />;
   }
 

@@ -23,6 +23,7 @@ export function LoginScreen() {
   const [email, setEmail] = useState("aditya@nusantara.co.id");
   const [password, setPassword] = useState("password123");
   const [showPassword, setShowPassword] = useState(false);
+  const [isVerifyingGps, setIsVerifyingGps] = useState(false);
 
   const handleRoleChange = (role: "karyawan" | "admin") => {
     setSelectedRole(role);
@@ -36,12 +37,18 @@ export function LoginScreen() {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (selectedRole === "admin") {
-      loginAsAdmin();
-    } else {
-      login(email, password);
+    setLoginError(null);
+    setIsVerifyingGps(true);
+    try {
+      if (selectedRole === "admin") {
+        loginAsAdmin();
+      } else {
+        await login(email, password);
+      }
+    } finally {
+      setIsVerifyingGps(false);
     }
   };
 
@@ -154,16 +161,28 @@ export function LoginScreen() {
           <div className="pt-2">
             <button
               type="submit"
+              disabled={isVerifyingGps}
               className={`w-full h-12.5 rounded-2xl text-white text-xs font-bold shadow-sm transition-all duration-150 flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98] ${
+                isVerifyingGps ? "opacity-80 cursor-wait" : ""
+              } ${
                 selectedRole === "admin"
                   ? "bg-[#0C2B22] hover:bg-[#12382D]"
                   : "bg-[#0D7A57] hover:bg-[#0A6447]"
               }`}
             >
-              <span>
-                Masuk sebagai {selectedRole === "admin" ? "Admin HR" : "Karyawan"}
-              </span>
-              <ArrowRight className="w-4 h-4" />
+              {isVerifyingGps ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  <span>Memverifikasi GPS HP...</span>
+                </>
+              ) : (
+                <>
+                  <span>
+                    Masuk sebagai {selectedRole === "admin" ? "Admin HR" : "Karyawan"}
+                  </span>
+                  <ArrowRight className="w-4 h-4" />
+                </>
+              )}
             </button>
           </div>
         </form>

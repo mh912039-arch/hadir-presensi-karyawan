@@ -93,7 +93,7 @@ interface MobileAppContextType {
   // Auth (Strict UNPAM Viktor 2 validation)
   loginError: string | null;
   setLoginError: (err: string | null) => void;
-  login: (email?: string, password?: string) => { success: boolean; message: string };
+  login: (email?: string, password?: string) => Promise<{ success: boolean; message: string }>;
   loginAsAdmin: () => void;
   loginAsKaryawan: () => void;
   logout: () => void;
@@ -406,10 +406,10 @@ const MobileAppContext = createContext<MobileAppContextType | undefined>(undefin
 export function MobileAppProvider({ children }: { children: React.ReactNode }) {
   // Roles
   const [currentRole, setCurrentRole] = useState<UserRole>("karyawan");
-  const [isLoggedIn, setIsLoggedIn] = useState(true);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [activeTab, setActiveTab] = useState<NavigationTab>("beranda");
   const [adminTab, setAdminTab] = useState<AdminTab>("cuti");
-  const [currentView, setCurrentView] = useState<AppView>("main");
+  const [currentView, setCurrentView] = useState<AppView>("login");
 
   // User & Active Account
   const [activeUserId, setActiveUserId] = useState<string>("emp-1");
@@ -511,9 +511,63 @@ export function MobileAppProvider({ children }: { children: React.ReactNode }) {
           setNotifications(parsed);
         }
       }
+
+      const savedLoggedIn = localStorage.getItem("hadir_is_logged_in");
+      if (savedLoggedIn === "true") {
+        setIsLoggedIn(true);
+        const savedRole = (localStorage.getItem("hadir_current_role") as UserRole) || "karyawan";
+        setCurrentRole(savedRole);
+        if (savedRole === "admin") {
+          setCurrentView("admin_portal");
+        } else {
+          setCurrentView("main");
+          setActiveTab("beranda");
+        }
+      } else {
+        setIsLoggedIn(false);
+        setCurrentView("login");
+      }
     } catch (e) {
       console.error("Failed to load state from localStorage:", e);
     }
+  }, []);
+
+  // Continuous Real GPS Tracking on Device / Phone
+  useEffect(() => {
+    if (typeof window === "undefined" || !navigator.geolocation) return;
+
+    let watchId: number | null = null;
+    try {
+      watchId = navigator.geolocation.watchPosition(
+        (pos) => {
+          setIsGpsEnabled(true);
+          const lat = pos.coords.latitude;
+          const lng = pos.coords.longitude;
+          setUserLat(lat);
+          setUserLng(lng);
+          const dist = calculateHaversineDistance(lat, lng, UNPAM_VIKTOR_LAT, UNPAM_VIKTOR_LNG);
+          setIsInsideOffice(dist <= 100);
+        },
+        (err) => {
+          if (err.code === err.PERMISSION_DENIED || err.code === err.POSITION_UNAVAILABLE) {
+            setIsGpsEnabled(false);
+          }
+        },
+        {
+          enableHighAccuracy: true,
+          maximumAge: 3000,
+          timeout: 10000,
+        }
+      );
+    } catch (e) {
+      console.warn("Geolocation watch init failed:", e);
+    }
+
+    return () => {
+      if (watchId !== null && typeof window !== "undefined" && navigator.geolocation) {
+        navigator.geolocation.clearWatch(watchId);
+      }
+    };
   }, []);
 
   // Calculate unread notification count for the active employee
@@ -623,54 +677,134 @@ export function MobileAppProvider({ children }: { children: React.ReactNode }) {
     });
   };
 
-  // Strict Login at UNPAM Viktor 2
-  const login = (email?: string, password?: string) => {
+  // Strict Login at UNPAM Viktor 2 (Validasi GPS HP Asli & Pengecualian Akun Uji Coba Aditya)
+  const login = async (
+    email?: string,
+    password?: string
+  ): Promise<{ success: boolean; message: string }> => {
     setLoginError(null);
 
-    // Aturan 1: GPS HP harus aktif
-    if (!isGpsEnabled) {
-      const msg = "Akses Ditolak: Sensor GPS HP Anda belum aktif! Silakan nyalakan lokasi pada perangkat untuk memvalidasi posisi Anda di UNPAM Viktor 2.";
-      setLoginError(msg);
-      return { success: false, message: msg };
-    }
-
-    // Aturan 2: HP harus berada di dalam radius 100 meter UNPAM Viktor 2
-    if (!gps.isInsideOffice || gps.distanceMeters > 100) {
-      const msg = `Akses Login Ditolak! Anda terdeteksi berada di luar area UNPAM Viktor 2 (Jarak: ${gps.distanceMeters} m, batas maksimal: 100 m). Sesuai kebijakan keamanan, login karyawan hanya dapat dilakukan di dalam area kampus UNPAM Viktor 2.`;
-      setLoginError(msg);
-      return { success: false, message: msg };
-    }
+    const cleanInput = (email || "").trim().toLowerCase();
+    const isAdityaTestAccount =
+      cleanInput === "aditya@nusantara.co.id" ||
+      cleanInput === "20240018" ||
+      cleanInput.includes("aditya");
 
     // Match employee by email if provided
+    let matched: EmployeeItem | undefined;
     if (email) {
-      const cleanEmail = email.trim().toLowerCase();
-      const matched = employees.find((e) => e.email.trim().toLowerCase() === cleanEmail);
-      if (matched) {
-        if (password && matched.password && matched.password !== password) {
-          const msg = "Kata sandi yang Anda masukkan salah.";
-          setLoginError(msg);
-          return { success: false, message: msg };
+      matched = employees.find(
+        (e) =>
+          e.email.trim().toLowerCase() === cleanInput ||
+          e.nip.trim().toLowerCase() === cleanInput
+      );
+    }
+
+    if (matched && password) {
+      if (matched.password && matched.password !== password) {
+        const msg = "Kata sandi yang Anda masukkan salah.";
+        setLoginError(msg);
+        return { success: false, message: msg };
+      }
+    } else if (!matched && !isAdityaTestAccount) {
+      const msg = "Akun karyawan tidak ditemukan. Periksa kembali email atau NIP Anda.";
+      setLoginError(msg);
+      return { success: false, message: msg };
+    }
+
+    // VALIDASI GPS HP UNTUK KARYAWAN (SELAIN AKUN UJI COBA ADITYA)
+    if (!isAdityaTestAccount) {
+      if (typeof window === "undefined" || !navigator.geolocation) {
+        const msg = "Akses Ditolak: Browser atau perangkat Anda tidak mendukung sensor lokasi GPS.";
+        setLoginError(msg);
+        return { success: false, message: msg };
+      }
+
+      let realLat = userLat;
+      let realLng = userLng;
+      let gpsSuccess = false;
+
+      try {
+        const pos = await new Promise<GeolocationPosition>((resolve, reject) => {
+          navigator.geolocation.getCurrentPosition(resolve, reject, {
+            enableHighAccuracy: true,
+            timeout: 8000,
+            maximumAge: 0,
+          });
+        });
+        realLat = pos.coords.latitude;
+        realLng = pos.coords.longitude;
+        setUserLat(realLat);
+        setUserLng(realLng);
+        setIsGpsEnabled(true);
+        gpsSuccess = true;
+      } catch (err: unknown) {
+        const geoErr = err as GeolocationPositionError;
+        setIsGpsEnabled(false);
+        let detail = "Sensor GPS HP belum aktif atau izin akses lokasi ditolak.";
+        if (geoErr && geoErr.code === 2) {
+          detail = "Sinyal GPS perangkat tidak dapat dideteksi. Pastikan lokasi HP sudah dinyalakan.";
+        } else if (geoErr && geoErr.code === 3) {
+          detail = "Waktu verifikasi GPS habis. Silakan coba lagi.";
         }
-        setActiveUserId(matched.id);
-        const newUser: UserProfile = {
-          name: matched.name,
-          email: matched.email,
-          role: matched.position,
-          division: matched.division.startsWith("Divisi ") ? matched.division : `Divisi ${matched.division}`,
-          nip: matched.nip,
-          status: matched.status,
-          companyName: "PT Nusantara Digital",
-          employmentStatus: "Karyawan tetap",
-          joinDate: matched.joinDate || "8 Januari 2024",
-          workLocation: "UNPAM Viktor 2",
-        };
-        setUser(newUser);
-        if (typeof window !== "undefined") {
-          try {
-            localStorage.setItem("hadir_active_user", JSON.stringify(newUser));
-            localStorage.setItem("hadir_active_user_id", matched.id);
-          } catch (e) {}
-        }
+        const msg = `Akses Ditolak: ${detail} Login hanya diizinkan di dalam area UNPAM Viktor 2.`;
+        setLoginError(msg);
+        return { success: false, message: msg };
+      }
+
+      if (!gpsSuccess) {
+        const msg = "Akses Ditolak: Sensor GPS HP Anda belum aktif! Silakan nyalakan lokasi pada perangkat untuk memvalidasi posisi Anda di UNPAM Viktor 2.";
+        setLoginError(msg);
+        return { success: false, message: msg };
+      }
+
+      // Validasi Radius 100m dari UNPAM Viktor 2
+      const dist = calculateHaversineDistance(realLat, realLng, UNPAM_VIKTOR_LAT, UNPAM_VIKTOR_LNG);
+      setIsInsideOffice(dist <= 100);
+
+      if (dist > 100) {
+        const formattedDist = dist >= 1000 ? `${(dist / 1000).toFixed(1)} km` : `${dist} meter`;
+        const msg = `Akses Login Ditolak! Anda terdeteksi berada di luar area UNPAM Viktor 2 (Jarak terdeteksi: ${formattedDist}, batas aman: 100 meter). Sesuai kebijakan keamanan, login karyawan hanya dapat dilakukan di dalam area kampus UNPAM Viktor 2.`;
+        setLoginError(msg);
+        return { success: false, message: msg };
+      }
+    } else {
+      // Akun Uji Coba Aditya: Bebas radius, perbarui koordinat jika ada
+      if (typeof window !== "undefined" && navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (pos) => {
+            setUserLat(pos.coords.latitude);
+            setUserLng(pos.coords.longitude);
+            setIsGpsEnabled(true);
+          },
+          () => {},
+          { enableHighAccuracy: true, timeout: 3000 }
+        );
+      }
+    }
+
+    // Set active user
+    const targetEmployee = matched || employees[0];
+    if (targetEmployee) {
+      setActiveUserId(targetEmployee.id);
+      const newUser: UserProfile = {
+        name: targetEmployee.name,
+        email: targetEmployee.email,
+        role: targetEmployee.position,
+        division: targetEmployee.division.startsWith("Divisi ") ? targetEmployee.division : `Divisi ${targetEmployee.division}`,
+        nip: targetEmployee.nip,
+        status: targetEmployee.status,
+        companyName: "PT Nusantara Digital",
+        employmentStatus: "Karyawan tetap",
+        joinDate: targetEmployee.joinDate || "8 Januari 2024",
+        workLocation: "UNPAM Viktor 2",
+      };
+      setUser(newUser);
+      if (typeof window !== "undefined") {
+        try {
+          localStorage.setItem("hadir_active_user", JSON.stringify(newUser));
+          localStorage.setItem("hadir_active_user_id", targetEmployee.id);
+        } catch (e) {}
       }
     }
 
@@ -680,7 +814,18 @@ export function MobileAppProvider({ children }: { children: React.ReactNode }) {
     setActiveTab("beranda");
     setCurrentView("main");
     setLoginError(null);
-    return { success: true, message: "Login berhasil di UNPAM Viktor 2" };
+    if (typeof window !== "undefined") {
+      try {
+        localStorage.setItem("hadir_is_logged_in", "true");
+        localStorage.setItem("hadir_current_role", "karyawan");
+      } catch (e) {}
+    }
+    return {
+      success: true,
+      message: isAdityaTestAccount
+        ? "Login berhasil (Akun Uji Coba: Aditya Pratama)"
+        : "Login berhasil di UNPAM Viktor 2",
+    };
   };
 
   // Confirm Clock-In
@@ -694,12 +839,17 @@ export function MobileAppProvider({ children }: { children: React.ReactNode }) {
       };
     }
 
-    // Validasi 2: Di dalam UNPAM Viktor 2 (≤ 100m)
-    if (!gps.isInsideOffice || gps.distanceMeters > 100) {
+    const isAdityaTestAccount =
+      user.email.toLowerCase().includes("aditya") ||
+      user.nip === "20240018";
+
+    // Validasi 2: Di dalam UNPAM Viktor 2 (≤ 100m) untuk akun selain uji coba
+    if (!isAdityaTestAccount && (!gps.isInsideOffice || gps.distanceMeters > 100)) {
+      const formattedDist = gps.distanceMeters >= 1000 ? `${(gps.distanceMeters / 1000).toFixed(1)} km` : `${gps.distanceMeters} m`;
       return {
         success: false,
         queued: false,
-        message: `Presensi Ditolak: Anda berada ${gps.distanceMeters} m di luar jangkauan UNPAM Viktor 2.`,
+        message: `Presensi Ditolak: Anda berada ${formattedDist} di luar jangkauan UNPAM Viktor 2 (Batas maksimal 100 m).`,
       };
     }
 
@@ -1230,6 +1380,12 @@ export function MobileAppProvider({ children }: { children: React.ReactNode }) {
     setAdminTab("cuti");
     setCurrentView("admin_portal");
     setLoginError(null);
+    if (typeof window !== "undefined") {
+      try {
+        localStorage.setItem("hadir_is_logged_in", "true");
+        localStorage.setItem("hadir_current_role", "admin");
+      } catch (e) {}
+    }
   };
 
   const loginAsKaryawan = () => {
@@ -1238,12 +1394,24 @@ export function MobileAppProvider({ children }: { children: React.ReactNode }) {
     setActiveTab("beranda");
     setCurrentView("main");
     setLoginError(null);
+    if (typeof window !== "undefined") {
+      try {
+        localStorage.setItem("hadir_is_logged_in", "true");
+        localStorage.setItem("hadir_current_role", "karyawan");
+      } catch (e) {}
+    }
   };
 
   const logout = () => {
     setIsLoggedIn(false);
     setCurrentView("login");
     setLoginError(null);
+    if (typeof window !== "undefined") {
+      try {
+        localStorage.removeItem("hadir_is_logged_in");
+        localStorage.removeItem("hadir_current_role");
+      } catch (e) {}
+    }
   };
 
   // Reset to default

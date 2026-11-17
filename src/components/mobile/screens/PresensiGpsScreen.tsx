@@ -1,12 +1,13 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ChevronLeft, ShieldCheck, AlertTriangle, LocateFixed, WifiOff } from "lucide-react";
 import { useMobileApp } from "@/context/MobileAppContext";
 import { LocationMapWidget } from "@/components/mobile/LocationMapWidget";
 
 export function PresensiGpsScreen() {
   const {
+    user,
     gps,
     toggleGpsEnabled,
     toggleGpsLocation,
@@ -18,25 +19,11 @@ export function PresensiGpsScreen() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isLocating, setIsLocating] = useState(false);
 
+  const isAdityaTestAccount =
+    (user.email || "").toLowerCase().includes("aditya") || user.nip === "20240018";
+
   const handleBack = () => {
     setCurrentView("main");
-  };
-
-  const handleActionClick = () => {
-    if (!gps.isGpsEnabled) {
-      setErrorMessage("Sensor GPS tidak aktif! Nyalakan izin lokasi pada HP Anda terlebih dahulu.");
-      return;
-    }
-
-    if (!gps.isInsideOffice) {
-      setErrorMessage("Presensi ditolak! Posisi Anda masih di luar radius 100m UNPAM Viktor 2.");
-      return;
-    }
-
-    const res = confirmAttendance();
-    if (!res.success) {
-      setErrorMessage(res.message);
-    }
   };
 
   const handleDetectRealGps = async () => {
@@ -44,6 +31,28 @@ export function PresensiGpsScreen() {
     setErrorMessage(null);
     const res = await requestRealBrowserGps();
     setIsLocating(false);
+    if (!res.success) {
+      setErrorMessage(res.message);
+    }
+  };
+
+  useEffect(() => {
+    // Sinkronkan GPS riil dari browser/ponsel saat membuka layar presensi
+    handleDetectRealGps();
+  }, []);
+
+  const handleActionClick = () => {
+    if (!gps.isGpsEnabled) {
+      setErrorMessage("Sensor GPS tidak aktif! Nyalakan izin lokasi pada HP Anda terlebih dahulu.");
+      return;
+    }
+
+    if (!gps.isInsideOffice && !isAdityaTestAccount) {
+      setErrorMessage("Presensi ditolak! Posisi Anda masih di luar radius 100m UNPAM Viktor 2.");
+      return;
+    }
+
+    const res = confirmAttendance();
     if (!res.success) {
       setErrorMessage(res.message);
     }
@@ -218,6 +227,14 @@ export function PresensiGpsScreen() {
             className="w-full h-13 rounded-2xl bg-[#0D7A57] hover:bg-[#0A6447] active:scale-[0.98] text-white text-sm font-bold shadow-sm transition-all duration-150 flex items-center justify-center cursor-pointer"
           >
             Konfirmasi presensi masuk
+          </button>
+        ) : isAdityaTestAccount ? (
+          <button
+            type="button"
+            onClick={handleActionClick}
+            className="w-full h-13 rounded-2xl bg-[#0D7A57] hover:bg-[#0A6447] active:scale-[0.98] text-white text-sm font-bold shadow-sm transition-all duration-150 flex items-center justify-center cursor-pointer"
+          >
+            Konfirmasi presensi (Akun Uji Coba)
           </button>
         ) : (
           <button
