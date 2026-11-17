@@ -2,6 +2,11 @@
 
 import React, { createContext, useContext, useState, useEffect } from "react";
 import {
+  logHadirAttendance,
+  logHadirLeaveRequest,
+  logHadirApproval,
+} from "@/lib/discordLogger";
+import {
   NavigationTab,
   AdminTab,
   UserRole,
@@ -757,6 +762,17 @@ export function MobileAppProvider({ children }: { children: React.ReactNode }) {
       return next;
     });
 
+    // Telemetri Discord Live
+    logHadirAttendance({
+      employeeName: user.name,
+      nip: user.nip,
+      position: user.role,
+      locationName: "UNPAM Viktor 2",
+      distanceMeters: gps.distanceMeters,
+      maxRadiusMeters: 100,
+      time: "07.52 WIB",
+    });
+
     setCurrentView("presensi_sukses");
     return { success: true, queued: isOffline, message: "Presensi berhasil di UNPAM Viktor 2" };
   };
@@ -800,6 +816,16 @@ export function MobileAppProvider({ children }: { children: React.ReactNode }) {
       }
       return next;
     });
+
+    // Telemetri Discord Live
+    logHadirLeaveRequest({
+      employeeName: user.name,
+      nip: user.nip,
+      leaveType: newRequest.leaveType,
+      date: newRequest.date,
+      reason: newRequest.reason,
+    });
+
     setCurrentView("pengajuan_sukses");
     return { success: true, queued: isOffline };
   };
@@ -870,6 +896,16 @@ export function MobileAppProvider({ children }: { children: React.ReactNode }) {
         console.error("Browser notification error:", e);
       }
     }
+
+    // Telemetri Discord Live
+    logHadirApproval({
+      employeeName: targetReq?.employeeName || user.name,
+      nip: targetReq?.nip || user.nip,
+      leaveType: targetReq?.leaveType || "Cuti Tahunan",
+      date: targetReq?.date || "13 November 2026",
+      decision: "Disetujui",
+      approver: "Rina Wijaya (HR Manager)",
+    });
   };
 
   // Admin Approval: Reject Leave & Trigger Notification to Employee Phone
@@ -936,6 +972,16 @@ export function MobileAppProvider({ children }: { children: React.ReactNode }) {
         console.error("Browser notification error:", e);
       }
     }
+
+    // Telemetri Discord Live
+    logHadirApproval({
+      employeeName: targetReq?.employeeName || user.name,
+      nip: targetReq?.nip || user.nip,
+      leaveType: targetReq?.leaveType || "Cuti Tahunan",
+      date: targetReq?.date || "13 November 2026",
+      decision: "Ditolak",
+      approver: "Rina Wijaya (HR Manager)",
+    });
   };
 
   // Notification action handlers
