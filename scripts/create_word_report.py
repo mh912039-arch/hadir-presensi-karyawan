@@ -467,66 +467,61 @@ def create_report():
 
     add_heading_3("3.3.2 Kamus Data (Data Dictionary)")
     
-    add_p("Tabel 3.2 Kamus Data Tabel karyawan (user_profiles)", bold=True, size=11.5, space_after=3)
+    add_p("Tabel 3.2 Kamus Data Karyawan", bold=True, size=11.5, space_after=3)
     tbl_3_2 = doc.add_table(rows=9, cols=4)
-    col_w_3_2 = [Cm(3.5), Cm(2.5), Cm(2.0), Cm(7.5)]
-    headers_3_2 = ["Nama Field", "Tipe Data", "Panjang", "Keterangan"]
+    col_w_3_2 = [Cm(4.0), Cm(2.2), Cm(2.3), Cm(7.0)]
+    headers_3_2 = ["Nama Data", "Tipe Data", "Ukuran", "Keterangan"]
     data_3_2 = [
-        ["id (PK)", "VARCHAR", "36", "Pengenal unik karyawan (UUID)"],
-        ["nip", "VARCHAR", "20", "Nomor Induk Pegawai unik"],
-        ["name", "VARCHAR", "100", "Nama lengkap karyawan"],
-        ["email", "VARCHAR", "100", "Alamat email dinas karyawan"],
-        ["password", "VARCHAR", "255", "Hash kata sandi terenkripsi"],
-        ["role_position", "VARCHAR", "50", "Jabatan struktural karyawan"],
-        ["division", "VARCHAR", "50", "Unit kerja / divisi"],
-        ["status_active", "VARCHAR", "15", "Status kepegawaian (Aktif / Nonaktif)"]
+        ["ID Karyawan (Kunci Utama)", "Teks", "10 karakter", "Kode pengenal unik tiap karyawan"],
+        ["NIP", "Teks", "20 karakter", "Nomor Induk Pegawai unik"],
+        ["Nama Lengkap", "Teks", "50 karakter", "Nama lengkap karyawan"],
+        ["Email Kantor", "Teks", "50 karakter", "Alamat email dinas untuk login"],
+        ["Kata Sandi", "Teks", "20 karakter", "Kata sandi akses login aplikasi"],
+        ["Jabatan", "Teks", "30 karakter", "Jabatan posisi kerja (misal: HR / Staf)"],
+        ["Divisi", "Teks", "30 karakter", "Bagian unit kerja karyawan"],
+        ["Status Kerja", "Teks", "15 karakter", "Status keaktifan (Aktif / Nonaktif)"]
     ]
     style_table(tbl_3_2, col_w_3_2, headers_3_2, data_3_2)
 
-    add_p("Tabel 3.3 Kamus Data Tabel attendance_logs", bold=True, size=11.5, space_before=8, space_after=3)
-    tbl_3_3 = doc.add_table(rows=10, cols=4)
-    col_w_3_3 = [Cm(3.5), Cm(2.5), Cm(2.0), Cm(7.5)]
-    headers_3_3 = ["Nama Field", "Tipe Data", "Panjang", "Keterangan"]
+    add_p("Tabel 3.3 Kamus Data Log Presensi Kehadiran", bold=True, size=11.5, space_before=8, space_after=3)
+    tbl_3_3 = doc.add_table(rows=8, cols=4)
+    col_w_3_3 = [Cm(4.0), Cm(2.2), Cm(2.3), Cm(7.0)]
+    headers_3_3 = ["Nama Data", "Tipe Data", "Ukuran", "Keterangan"]
     data_3_3 = [
-        ["id (PK)", "VARCHAR", "36", "Pengenal unik log presensi"],
-        ["user_id (FK)", "VARCHAR", "36", "Kunci relasi ke tabel karyawan"],
-        ["office_id (FK)", "VARCHAR", "36", "Kunci relasi ke tabel office_locations"],
-        ["time_clock_in", "VARCHAR", "10", "Waktu presensi masuk (WIB)"],
-        ["date_entry", "DATE", "-", "Tanggal pelaksanaan presensi"],
-        ["user_latitude", "DECIMAL", "10,7", "Koordinat lintang saat presensi"],
-        ["user_longitude", "DECIMAL", "10,7", "Koordinat bujur saat presensi"],
-        ["distance_meters", "INT", "6", "Jarak meter dari titik acuan kantor"],
-        ["status_presence", "VARCHAR", "20", "Status kehadiran (Tepat Waktu / Terlambat)"]
+        ["ID Presensi (Kunci Utama)", "Teks", "10 karakter", "Nomor transaksi pencatatan absensi"],
+        ["NIP Karyawan", "Teks", "20 karakter", "Relasi ke identitas pegawai yang hadir"],
+        ["Jam Masuk", "Waktu", "8 karakter", "Waktu pencatatan kehadiran (WIB)"],
+        ["Tanggal Hadir", "Tanggal", "10 karakter", "Tanggal pelaksanaan presensi kerja"],
+        ["Lokasi Kantor", "Teks", "30 karakter", "Nama lokasi acuan (UNPAM Viktor 2)"],
+        ["Jarak GPS", "Angka", "5 digit", "Jarak posisi HP ke kampus (dalam meter)"],
+        ["Status Kehadiran", "Teks", "20 karakter", "Keterangan Tepat Waktu atau Terlambat"]
     ]
     style_table(tbl_3_3, col_w_3_3, headers_3_3, data_3_3)
 
-    add_p("Tabel 3.4 Kamus Data Tabel leave_requests", bold=True, size=11.5, space_before=8, space_after=3)
-    tbl_3_4 = doc.add_table(rows=10, cols=4)
-    col_w_3_4 = [Cm(3.5), Cm(2.5), Cm(2.0), Cm(7.5)]
-    headers_3_4 = ["Nama Field", "Tipe Data", "Panjang", "Keterangan"]
+    add_p("Tabel 3.4 Kamus Data Pengajuan Cuti", bold=True, size=11.5, space_before=8, space_after=3)
+    tbl_3_4 = doc.add_table(rows=8, cols=4)
+    col_w_3_4 = [Cm(4.0), Cm(2.2), Cm(2.3), Cm(7.0)]
+    headers_3_4 = ["Nama Data", "Tipe Data", "Ukuran", "Keterangan"]
     data_3_4 = [
-        ["id (PK)", "VARCHAR", "36", "Pengenal unik pengajuan cuti"],
-        ["user_id (FK)", "VARCHAR", "36", "Kunci relasi ke pemohon cuti"],
-        ["request_number", "VARCHAR", "25", "Nomor registrasi pengajuan (auto-generated)"],
-        ["leave_type", "VARCHAR", "30", "Jenis cuti (Tahunan, Sakit, Alasan Penting)"],
-        ["date_effective", "VARCHAR", "30", "Tanggal pelaksanaan cuti"],
-        ["duration_days", "VARCHAR", "20", "Lama durasi hari cuti"],
-        ["reason_text", "TEXT", "-", "Deskripsi alasan pengajuan cuti"],
-        ["status_approval", "VARCHAR", "15", "Status putusan (Menunggu, Disetujui, Ditolak)"],
-        ["approver_name", "VARCHAR", "100", "Nama pejabat HR yang memutus"]
+        ["ID Cuti (Kunci Utama)", "Teks", "10 karakter", "Nomor pengenal unik pengajuan cuti"],
+        ["NIP Karyawan", "Teks", "20 karakter", "Relasi identitas pegawai pemohon cuti"],
+        ["Jenis Cuti", "Teks", "30 karakter", "Kategori cuti (Tahunan, Sakit, Alasan Penting)"],
+        ["Tanggal Cuti", "Tanggal", "10 karakter", "Tanggal waktu dimulainya cuti"],
+        ["Lama Cuti", "Teks", "15 karakter", "Durasi hari cuti (misal: 1 Hari)"],
+        ["Alasan Izin", "Teks", "Bebas", "Uraian keperluan atau alasan izin cuti"],
+        ["Status Persetujuan", "Teks", "15 karakter", "Hasil putusan HR (Menunggu, Disetujui, Ditolak)"]
     ]
     style_table(tbl_3_4, col_w_3_4, headers_3_4, data_3_4)
 
-    add_p("Tabel 3.5 Kamus Data Tabel office_locations", bold=True, size=11.5, space_before=8, space_after=3)
-    tbl_3_5 = doc.add_table(rows=6, cols=4)
-    col_w_3_5 = [Cm(3.5), Cm(2.5), Cm(2.0), Cm(7.5)]
-    headers_3_5 = ["Nama Field", "Tipe Data", "Panjang", "Keterangan"]
+    add_p("Tabel 3.5 Kamus Data Lokasi Kantor Acuan", bold=True, size=11.5, space_before=8, space_after=3)
+    tbl_3_5 = doc.add_table(rows=5, cols=4)
+    col_w_3_5 = [Cm(4.0), Cm(2.2), Cm(2.3), Cm(7.0)]
+    headers_3_5 = ["Nama Data", "Tipe Data", "Ukuran", "Keterangan"]
     data_3_5 = [
-        ["id (PK)", "VARCHAR", "36", "Pengenal unik titik kantor"],
-        ["office_name", "VARCHAR", "50", "Nama lokasi acuan (UNPAM Viktor 2)"],
-        ["center_latitude", "DECIMAL", "10,7", "Koordinat lintang titik pusat (-6.3458000)"],
-        ["center_longitude", "DECIMAL", "10,7", "Koordinat bujur titik pusat (106.6917000)"],
-        ["max_radius_meter", "INT", "4", "Batas radius validasi toleransi (100 meter)"]
+        ["ID Lokasi (Kunci Utama)", "Teks", "10 karakter", "Kode pengenal titik lokasi kantor"],
+        ["Nama Kantor", "Teks", "30 karakter", "Nama tempat acuan (UNPAM Viktor 2)"],
+        ["Titik Koordinat GPS", "Koordinat", "20 karakter", "Posisi lintang dan bujur UNPAM Viktor 2"],
+        ["Radius Maksimal", "Angka", "4 digit", "Batas jarak toleransi presensi (100 meter)"]
     ]
     style_table(tbl_3_5, col_w_3_5, headers_3_5, data_3_5)
 

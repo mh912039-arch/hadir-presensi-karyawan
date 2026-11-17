@@ -114,27 +114,27 @@ def generate_dfd_1():
     ax.text(6.8, 2.2, "4.0\nKelola Pegawai &\nLaporan Eksekutif", ha="center", va="center", fontsize=8.5, fontweight="bold", bbox=proc_style)
 
     # Data Stores
-    ax.text(5.0, 7.0, "[ D1: Master Karyawan & Akun ]", ha="center", va="center", fontsize=8.5, fontweight="bold", bbox=store_style)
+    ax.text(5.0, 7.0, "[ D1: Data Karyawan & Akun ]", ha="center", va="center", fontsize=8.5, fontweight="bold", bbox=store_style)
     ax.text(5.0, 4.2, "[ D2: Log Presensi GPS ]", ha="center", va="center", fontsize=8.5, fontweight="bold", bbox=store_style)
     ax.text(5.0, 0.6, "[ D3: Pengajuan Izin & Cuti ]", ha="center", va="center", fontsize=8.5, fontweight="bold", bbox=store_style)
 
     arrow = dict(arrowstyle="->", color="#333333", lw=1.3)
-    ax.annotate("", xy=(2.3, 5.8), xytext=(1.6, 5.8), arrowprops=arrow) # Karyawan -> 1.0
-    ax.annotate("", xy=(4.2, 6.7), xytext=(3.5, 6.3), arrowprops=arrow) # 1.0 -> D1
-    ax.annotate("", xy=(6.0, 5.8), xytext=(4.1, 5.8), arrowprops=arrow) # 1.0 -> 2.0
-    ax.annotate("", xy=(5.5, 4.6), xytext=(6.5, 5.3), arrowprops=arrow) # 2.0 -> D2
-    ax.annotate("", xy=(3.2, 3.0), xytext=(3.2, 5.0), arrowprops=arrow) # Karyawan flow to 3.0
-    ax.annotate("", xy=(4.5, 1.0), xytext=(3.5, 1.7), arrowprops=arrow) # 3.0 -> D3
-    ax.annotate("", xy=(6.0, 1.8), xytext=(5.6, 1.0), arrowprops=arrow) # D3 -> 4.0
-    ax.annotate("", xy=(8.4, 2.2), xytext=(7.7, 2.2), arrowprops=arrow) # 4.0 -> Admin
-    ax.annotate("", xy=(6.8, 3.7), xytext=(6.8, 2.9), arrowprops=arrow) # 4.0 -> D2 query
+    ax.annotate("", xy=(2.3, 5.8), xytext=(1.6, 5.8), arrowprops=arrow)
+    ax.annotate("", xy=(4.2, 6.7), xytext=(3.5, 6.3), arrowprops=arrow)
+    ax.annotate("", xy=(6.0, 5.8), xytext=(4.1, 5.8), arrowprops=arrow)
+    ax.annotate("", xy=(5.5, 4.6), xytext=(6.5, 5.3), arrowprops=arrow)
+    ax.annotate("", xy=(3.2, 3.0), xytext=(3.2, 5.0), arrowprops=arrow)
+    ax.annotate("", xy=(4.5, 1.0), xytext=(3.5, 1.7), arrowprops=arrow)
+    ax.annotate("", xy=(6.0, 1.8), xytext=(5.6, 1.0), arrowprops=arrow)
+    ax.annotate("", xy=(8.4, 2.2), xytext=(7.7, 2.2), arrowprops=arrow)
+    ax.annotate("", xy=(6.8, 3.7), xytext=(6.8, 2.9), arrowprops=arrow)
 
     out_path = r"D:\TUGAS\SIM SMT5\docs\diagram_images\dfd_level_1.png"
     plt.savefig(out_path, bbox_inches="tight", facecolor="white")
     plt.close()
     print("Saved:", out_path)
 
-# ----------------- 4. Entity Relationship Diagram (Gambar 3.3) -----------------
+# ----------------- 4. Simplified ERD (Gambar 3.3) Tanpa Istilah Rumit -----------------
 def generate_erd():
     fig, ax = plt.subplots(figsize=(10, 6.5), dpi=300)
     ax.set_xlim(0, 10)
@@ -145,39 +145,36 @@ def generate_erd():
     entity_body = dict(boxstyle="square,pad=0.5", fc="#F8FAF9", ec="#D0D0D0", lw=1.2)
 
     # 1. KARYAWAN
-    ax.text(2.2, 6.3, "KARYAWAN (user_profiles)", ha="center", va="center", fontsize=9, fontweight="bold", color="white", bbox=entity_head)
-    karyawan_text = "PK  id (UUID)\n     nip (VARCHAR)\n     name (VARCHAR)\n     email (VARCHAR)\n     password (VARCHAR)\n     role_position (VARCHAR)\n     division (VARCHAR)\n     status_active (VARCHAR)"
-    ax.text(2.2, 4.7, karyawan_text, ha="left", va="center", fontsize=7.8, family="monospace", bbox=entity_body)
+    ax.text(2.2, 6.3, "TABEL KARYAWAN", ha="center", va="center", fontsize=9.5, fontweight="bold", color="white", bbox=entity_head)
+    karyawan_text = "* ID Pegawai (Kunci Utama)\n* NIP (Teks)\n* Nama Lengkap (Teks)\n* Email Dinas (Teks)\n* Kata Sandi (Teks)\n* Jabatan (Teks)\n* Divisi Kerja (Teks)\n* Status Keaktifan (Teks)"
+    ax.text(2.2, 4.7, karyawan_text, ha="left", va="center", fontsize=8.2, family="sans-serif", bbox=entity_body)
 
-    # 2. ATTENDANCE_LOGS
-    ax.text(7.8, 6.3, "ATTENDANCE_LOGS", ha="center", va="center", fontsize=9, fontweight="bold", color="white", bbox=entity_head)
-    att_text = "PK  id (UUID)\nFK  user_id (UUID)\nFK  office_id (UUID)\n     time_clock_in (VARCHAR)\n     date_entry (DATE)\n     user_latitude (DECIMAL)\n     user_longitude (DECIMAL)\n     distance_meters (INT)\n     status_presence (VARCHAR)"
-    ax.text(7.8, 4.6, att_text, ha="left", va="center", fontsize=7.8, family="monospace", bbox=entity_body)
+    # 2. LOG PRESENSI
+    ax.text(7.8, 6.3, "TABEL LOG PRESENSI", ha="center", va="center", fontsize=9.5, fontweight="bold", color="white", bbox=entity_head)
+    att_text = "* ID Presensi (Kunci Utama)\n* NIP Pegawai (Penghubung)\n* Titik Kantor (Penghubung)\n* Jam Masuk (Waktu)\n* Tanggal Hadir (Tanggal)\n* Jarak GPS (Angka/Meter)\n* Status Kehadiran (Teks)"
+    ax.text(7.8, 4.7, att_text, ha="left", va="center", fontsize=8.2, family="sans-serif", bbox=entity_body)
 
-    # 3. LEAVE_REQUESTS
-    ax.text(2.2, 2.5, "LEAVE_REQUESTS", ha="center", va="center", fontsize=9, fontweight="bold", color="white", bbox=entity_head)
-    leave_text = "PK  id (UUID)\nFK  user_id (UUID)\n     request_number (VARCHAR)\n     leave_type (VARCHAR)\n     date_effective (VARCHAR)\n     duration_days (VARCHAR)\n     reason_text (TEXT)\n     status_approval (VARCHAR)\n     approver_name (VARCHAR)"
-    ax.text(2.2, 1.1, leave_text, ha="left", va="center", fontsize=7.8, family="monospace", bbox=entity_body)
+    # 3. PENGAJUAN CUTI
+    ax.text(2.2, 2.5, "TABEL PENGAJUAN CUTI", ha="center", va="center", fontsize=9.5, fontweight="bold", color="white", bbox=entity_head)
+    leave_text = "* ID Cuti (Kunci Utama)\n* NIP Pemohon (Penghubung)\n* Jenis Cuti (Teks)\n* Tanggal Izin (Tanggal)\n* Durasi Hari (Teks)\n* Alasan Izin (Teks)\n* Status Putusan (Teks)"
+    ax.text(2.2, 1.2, leave_text, ha="left", va="center", fontsize=8.2, family="sans-serif", bbox=entity_body)
 
-    # 4. OFFICE_LOCATIONS
-    ax.text(7.8, 2.5, "OFFICE_LOCATIONS", ha="center", va="center", fontsize=9, fontweight="bold", color="white", bbox=entity_head)
-    office_text = "PK  id (UUID)\n     office_name (VARCHAR)\n     center_latitude (DECIMAL)\n     center_longitude (DECIMAL)\n     max_radius_meter (INT)"
-    ax.text(7.8, 1.4, office_text, ha="left", va="center", fontsize=7.8, family="monospace", bbox=entity_body)
+    # 4. LOKASI KANTOR
+    ax.text(7.8, 2.5, "TABEL LOKASI KANTOR", ha="center", va="center", fontsize=9.5, fontweight="bold", color="white", bbox=entity_head)
+    office_text = "* ID Kantor (Kunci Utama)\n* Nama Tempat: UNPAM Viktor 2\n* Titik GPS: Lintang & Bujur\n* Batas Aman: 100 Meter"
+    ax.text(7.8, 1.4, office_text, ha="left", va="center", fontsize=8.2, family="sans-serif", bbox=entity_body)
 
     # Relations
     line = dict(color="#1B4965", lw=1.8)
-    # Karyawan (1) --- (M) Attendance
     ax.plot([3.8, 6.3], [5.0, 5.0], **line)
     ax.text(4.0, 5.2, "1", fontsize=9, fontweight="bold", color="#1B4965")
     ax.text(6.1, 5.2, "M", fontsize=9, fontweight="bold", color="#1B4965")
     ax.text(5.05, 5.25, "mencatat presensi", fontsize=8, ha="center", color="#555555")
 
-    # Karyawan (1) --- (M) Leave
     ax.plot([2.2, 2.2], [3.7, 2.7], **line)
     ax.text(2.4, 3.5, "1", fontsize=9, fontweight="bold", color="#1B4965")
     ax.text(2.4, 2.9, "M", fontsize=9, fontweight="bold", color="#1B4965")
 
-    # Office (1) --- (M) Attendance
     ax.plot([7.8, 7.8], [2.7, 3.6], **line)
     ax.text(8.0, 2.9, "1", fontsize=9, fontweight="bold", color="#1B4965")
     ax.text(8.0, 3.4, "M", fontsize=9, fontweight="bold", color="#1B4965")
