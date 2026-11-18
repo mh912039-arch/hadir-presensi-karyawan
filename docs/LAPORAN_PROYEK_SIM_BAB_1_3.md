@@ -147,7 +147,7 @@ Tabel 1.3 Jadwal Pelaksanaan Proyek (SDLC)
 #### 2.2.2 Flowchart Sistem yang Berjalan
 
 ![Gambar 2.1 Flowchart Sistem Presensi dan Pengajuan Cuti yang Sedang Berjalan](/D:/TUGAS/SIM%20SMT5/docs/diagram_images/flowchart_berjalan.png)  
-*Gambar 2.1 Flowchart Sistem Presensi dan Pengajuan Cuti yang Sedang Berjalan*
+*Gambar 2.1 Flowchart Sistem Presensi dan Pengajuan Cuti yang Sedang Berjalan (Dirancang dengan Draw.io — Berkas mentah: [flowchart_berjalan.drawio](file:///D:/TUGAS/SIM%20SMT5/docs/diagrams_drawio/flowchart_berjalan.drawio))*
 
 ### 2.3 Identifikasi Masalah
 
@@ -230,9 +230,9 @@ Tabel 3.1 Komponen SIM Usulan (Materi P2)
 #### 3.2.1 Flowchart Sistem Usulan - Presensi Berbasis GPS (*Geofencing*)
 
 ![Gambar 3.1 Flowchart Sistem Usulan - Presensi Berbasis GPS (Geofencing)](/D:/TUGAS/SIM%20SMT5/docs/diagram_images/flowchart_usulan_presensi.png)  
-*Gambar 3.1 Flowchart Sistem Usulan - Presensi Berbasis GPS (Geofencing)*
+*Gambar 3.1 Flowchart Sistem Usulan - Presensi Berbasis GPS (Geofencing) (Dirancang dengan Draw.io — Berkas mentah: [flowchart_usulan_presensi.drawio](file:///D:/TUGAS/SIM%20SMT5/docs/diagrams_drawio/flowchart_usulan_presensi.drawio))*
 
-Flowchart pada Gambar 3.1 menggambarkan alur kerja presensi mandiri karyawan menggunakan sistem hadir. berbasis validasi sensor lokasi GPS:
+Flowchart pada Gambar 3.1 menggambarkan alur kerja presensi mandiri karyawan menggunakan sistem hadir. berbasis validasi sensor lokasi GPS (dirancang dengan standar notasi Draw.io):
 1. Karyawan membuka peramban ponsel pintar dan mengakses web mobile hadir. saat tiba di area Kampus UNPAM Viktor 2.
 2. Sistem melalui Geolocation API mendeteksi koordinat lintang dan bujur posisi ponsel secara otomatis.
 3. Jika sensor GPS ponsel dalam kondisi mati atau izin lokasi ditolak, sistem menampilkan peringatan dan mengunci tombol login/presensi.
@@ -245,9 +245,9 @@ Flowchart pada Gambar 3.1 menggambarkan alur kerja presensi mandiri karyawan men
 #### 3.2.2 Flowchart Sistem Usulan - Pengajuan dan Persetujuan Cuti Digital
 
 ![Gambar 3.2 Flowchart Sistem Usulan - Pengajuan dan Persetujuan Cuti Digital](/D:/TUGAS/SIM%20SMT5/docs/diagram_images/flowchart_usulan_cuti.png)  
-*Gambar 3.2 Flowchart Sistem Usulan - Pengajuan dan Persetujuan Cuti Digital*
+*Gambar 3.2 Flowchart Sistem Usulan - Pengajuan dan Persetujuan Cuti Digital (Dirancang dengan Draw.io — Berkas mentah: [flowchart_usulan_cuti.drawio](file:///D:/TUGAS/SIM%20SMT5/docs/diagrams_drawio/flowchart_usulan_cuti.drawio))*
 
-Flowchart pada Gambar 3.2 menggambarkan alur pengajuan dan persetujuan izin/cuti karyawan secara *paperless*:
+Flowchart pada Gambar 3.2 menggambarkan alur pengajuan dan persetujuan izin/cuti karyawan secara *paperless* (dirancang dengan standar notasi Draw.io):
 1. Karyawan memilih menu Pengajuan Cuti pada antarmuka aplikasi hadir. di ponsel pribadinya.
 2. Karyawan mengisi formulir digital yang meliputi jenis cuti (Tahunan, Sakit, atau Alasan Penting), tanggal cuti, durasi hari, dan uraian alasan izin.
 3. Karyawan menekan tombol Kirim Pengajuan, sistem menyimpan data pengajuan dengan status 'Menunggu' dan langsung memperbarui daftar pengajuan di portal Admin HR.
@@ -261,7 +261,7 @@ Flowchart pada Gambar 3.2 menggambarkan alur pengajuan dan persetujuan izin/cuti
 #### 3.3.1 Entity Relationship Diagram (ERD)
 
 ![Gambar 3.3 Entity Relationship Diagram (ERD) Sistem Informasi hadir.](/D:/TUGAS/SIM%20SMT5/docs/diagram_images/erd_diagram.png)  
-*Gambar 3.3 Entity Relationship Diagram (ERD) Sistem Informasi hadir.*
+*Gambar 3.3 Entity Relationship Diagram (ERD) Sistem Informasi hadir. (Dirancang dengan Draw.io — Berkas mentah: [erd_diagram.drawio](file:///D:/TUGAS/SIM%20SMT5/docs/diagrams_drawio/erd_diagram.drawio))*
 
 #### 3.3.2 Kamus Data (*Data Dictionary*)
 

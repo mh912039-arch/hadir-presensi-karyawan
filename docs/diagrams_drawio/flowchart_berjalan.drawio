@@ -1,0 +1,53 @@
+<mxfile host="app.diagrams.net" modified="2026-11-18T01:30:00.000Z" agent="Draw.io" version="24.7.5">
+  <diagram id="flow_berjalan" name="Flowchart Berjalan">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        
+        <!-- Swimlane Karyawan -->
+        <mxCell id="pool_karyawan" value="ENTITAS KARYAWAN" style="swimlane;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#1b365d;fontStyle=1;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="40" y="40" width="340" height="720" as="geometry"/>
+        </mxCell>
+        <mxCell id="k1" value="Mulai: Tiba di Kampus UNPAM Viktor 2" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontColor=#274e13;fontSize=11;" vertex="1" parent="pool_karyawan">
+          <mxGeometry x="50" y="50" width="240" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="k2" value="Tanda Tangan Manual Buku Absensi&#xa;(Tanpa Verifikasi GPS / Rawan Titip Absen)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="pool_karyawan">
+          <mxGeometry x="40" y="140" width="260" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="k3" value="Mengisi Formulir Kertas Cuti atau&#xa;Kirim Pesan WhatsApp Pribadi" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="pool_karyawan">
+          <mxGeometry x="40" y="250" width="260" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="k4" value="Menerima Putusan Cuti&#xa;(Menunggu 3 hingga 5 Hari)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontColor=#274e13;fontSize=11;" vertex="1" parent="pool_karyawan">
+          <mxGeometry x="40" y="490" width="260" height="50" as="geometry"/>
+        </mxCell>
+
+        <!-- Swimlane Admin HR -->
+        <mxCell id="pool_admin" value="ENTITAS ADMIN HR" style="swimlane;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontColor=#274e13;fontStyle=1;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="420" y="40" width="340" height="720" as="geometry"/>
+        </mxCell>
+        <mxCell id="a1" value="Menerima Berkas Kertas Cuti /&#xa;Pesan WhatsApp dari Karyawan" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;" vertex="1" parent="pool_admin">
+          <mxGeometry x="40" y="250" width="260" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="a2" value="Memeriksa Sisa Kuota Cuti di&#xa;Buku Catatan Arsip Manual" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;" vertex="1" parent="pool_admin">
+          <mxGeometry x="40" y="360" width="260" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="a3" value="Pengajuan&#xa;Disetujui?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=11;fontStyle=1;" vertex="1" parent="pool_admin">
+          <mxGeometry x="110" y="460" width="120" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="a4" value="Akhir Bulan: Salin Manual Data Presensi&#xa;ke Microsoft Excel (Menyita 3-5 Hari)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;fontSize=11;" vertex="1" parent="pool_admin">
+          <mxGeometry x="40" y="610" width="260" height="60" as="geometry"/>
+        </mxCell>
+
+        <!-- Edges -->
+        <mxCell id="e1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;entryX=0.5;entryY=0;strokeWidth=1.5;strokeColor=#333333;" edge="1" parent="1" source="k1" target="k2"/>
+        <mxCell id="e2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;entryX=0.5;entryY=0;strokeWidth=1.5;strokeColor=#333333;" edge="1" parent="1" source="k2" target="k3"/>
+        <mxCell id="e3" value="Kirim Berkas" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;entryX=0;entryY=0.5;strokeWidth=1.5;strokeColor=#333333;" edge="1" parent="1" source="k3" target="a1"/>
+        <mxCell id="e4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;entryX=0.5;entryY=0;strokeWidth=1.5;strokeColor=#333333;" edge="1" parent="1" source="a1" target="a2"/>
+        <mxCell id="e5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;entryX=0.5;entryY=0;strokeWidth=1.5;strokeColor=#333333;" edge="1" parent="1" source="a2" target="a3"/>
+        <mxCell id="e6" value="Ya / Tolak" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;entryX=1;entryY=0.5;strokeWidth=1.5;strokeColor=#333333;" edge="1" parent="1" source="a3" target="k4"/>
+        <mxCell id="e7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;entryX=0.5;entryY=0;strokeWidth=1.5;strokeColor=#333333;" edge="1" parent="1" source="a3" target="a4"/>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

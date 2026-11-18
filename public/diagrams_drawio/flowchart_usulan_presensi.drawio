@@ -1,0 +1,76 @@
+<mxfile host="app.diagrams.net" modified="2026-11-18T01:30:00.000Z" agent="Draw.io" version="24.7.5">
+  <diagram id="flow_presensi" name="Flowchart Presensi GPS">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        
+        <!-- Pool Karyawan -->
+        <mxCell id="pool_k" value="KARYAWAN (PONSEL PRIBADI)" style="swimlane;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#1b365d;fontStyle=1;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="40" y="40" width="350" height="920" as="geometry"/>
+        </mxCell>
+        <mxCell id="kp1" value="Mulai: Buka Web hadir. di Ponsel" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontColor=#274e13;fontSize=11;" vertex="1" parent="pool_k">
+          <mxGeometry x="50" y="50" width="250" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="kp2" value="Peringatan: Harap Aktifkan GPS Ponsel&#xa;(Tombol Login &amp; Presensi Dikunci)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontColor=#990000;fontSize=11;" vertex="1" parent="pool_k">
+          <mxGeometry x="40" y="160" width="270" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="kp3" value="Peringatan: Di Luar Area Kantor&#xa;(Akses Absen Ditolak / Tombol Terkunci)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontColor=#990000;fontSize=11;" vertex="1" parent="pool_k">
+          <mxGeometry x="40" y="380" width="270" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="kp4" value="Masukkan Email &amp; Kata Sandi,&#xa;Lalu Klik &quot;Masuk ke Akun&quot;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="pool_k">
+          <mxGeometry x="40" y="500" width="270" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="kp5" value="Notifikasi Presensi Berhasil&#xa;Muncul di Layar HP Karyawan" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontColor=#274e13;fontSize=11;" vertex="1" parent="pool_k">
+          <mxGeometry x="40" y="730" width="270" height="60" as="geometry"/>
+        </mxCell>
+
+        <!-- Pool Sistem -->
+        <mxCell id="pool_s" value="SISTEM hadir. &amp; GPS SERVER" style="swimlane;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontColor=#274e13;fontStyle=1;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="430" y="40" width="350" height="920" as="geometry"/>
+        </mxCell>
+        <mxCell id="sp1" value="Deteksi Koordinat GPS Ponsel&#xa;(Geolocation API Ponsel)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;" vertex="1" parent="pool_s">
+          <mxGeometry x="40" y="50" width="270" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="sp2" value="Apakah GPS&#xa;HP Aktif?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;fontStyle=1;" vertex="1" parent="pool_s">
+          <mxGeometry x="110" y="150" width="130" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="sp3" value="Hitung Jarak Koordinat HP ke&#xa;Titik Acuan UNPAM Viktor 2" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;" vertex="1" parent="pool_s">
+          <mxGeometry x="40" y="270" width="270" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="sp4" value="Jarak &lt;=&#xa;100 Meter?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;fontStyle=1;" vertex="1" parent="pool_s">
+          <mxGeometry x="110" y="370" width="130" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="sp5" value="Status: Area UNPAM Viktor 2&#xa;(Tombol Presensi Terbuka)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontColor=#274e13;fontSize=11;" vertex="1" parent="pool_s">
+          <mxGeometry x="40" y="500" width="270" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="sp6" value="Simpan Log Presensi Otomatis:&#xa;* NIP Pegawai &amp; Jam Masuk (WIB)&#xa;* Jarak Meter GPS &amp; Tanggal&#xa;* Status Tepat Waktu / Terlambat" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=11;" vertex="1" parent="pool_s">
+          <mxGeometry x="40" y="600" width="270" height="70" as="geometry"/>
+        </mxCell>
+        <mxCell id="sp7" value="Log Kehadiran Otomatis Tampil&#xa;di Dasbor Admin HR (Real-Time)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontColor=#274e13;fontSize=11;" vertex="1" parent="pool_s">
+          <mxGeometry x="40" y="730" width="270" height="60" as="geometry"/>
+        </mxCell>
+        
+        <!-- Selesai -->
+        <mxCell id="end_node" value="Selesai" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontColor=#274e13;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="340" y="870" width="140" height="50" as="geometry"/>
+        </mxCell>
+
+        <!-- Connectors -->
+        <mxCell id="ce1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=1.5;strokeColor=#333333;" edge="1" parent="1" source="kp1" target="sp1"/>
+        <mxCell id="ce2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=1.5;strokeColor=#333333;" edge="1" parent="1" source="sp1" target="sp2"/>
+        <mxCell id="ce3" value="Tidak" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=1.5;strokeColor=#b85450;fontColor=#990000;fontStyle=1;" edge="1" parent="1" source="sp2" target="kp2"/>
+        <mxCell id="ce4" value="Ya" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=1.5;strokeColor=#82b366;fontColor=#274e13;fontStyle=1;" edge="1" parent="1" source="sp2" target="sp3"/>
+        <mxCell id="ce5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=1.5;strokeColor=#333333;" edge="1" parent="1" source="sp3" target="sp4"/>
+        <mxCell id="ce6" value="Tidak" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=1.5;strokeColor=#b85450;fontColor=#990000;fontStyle=1;" edge="1" parent="1" source="sp4" target="kp3"/>
+        <mxCell id="ce7" value="Ya" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=1.5;strokeColor=#82b366;fontColor=#274e13;fontStyle=1;" edge="1" parent="1" source="sp4" target="sp5"/>
+        <mxCell id="ce8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=1.5;strokeColor=#333333;" edge="1" parent="1" source="sp5" target="kp4"/>
+        <mxCell id="ce9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=1.5;strokeColor=#333333;" edge="1" parent="1" source="kp4" target="sp6"/>
+        <mxCell id="ce10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=1.5;strokeColor=#333333;" edge="1" parent="1" source="sp6" target="sp7"/>
+        <mxCell id="ce11" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=1.5;strokeColor=#333333;" edge="1" parent="1" source="sp6" target="kp5"/>
+        <mxCell id="ce12" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=1.5;strokeColor=#333333;" edge="1" parent="1" source="kp5" target="end_node"/>
+        <mxCell id="ce13" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=1.5;strokeColor=#333333;" edge="1" parent="1" source="sp7" target="end_node"/>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

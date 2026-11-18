@@ -1,0 +1,70 @@
+<mxfile host="app.diagrams.net" modified="2026-11-18T01:30:00.000Z" agent="Draw.io" version="24.7.5">
+  <diagram id="flow_cuti" name="Flowchart Cuti Online">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        
+        <!-- Pool Karyawan -->
+        <mxCell id="pool_kc" value="KARYAWAN (PEMOHON CUTI)" style="swimlane;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#1b365d;fontStyle=1;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="40" y="40" width="350" height="920" as="geometry"/>
+        </mxCell>
+        <mxCell id="kc1" value="Mulai: Pilih Menu Pengajuan Cuti" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontColor=#274e13;fontSize=11;" vertex="1" parent="pool_kc">
+          <mxGeometry x="50" y="50" width="250" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="kc2" value="Mengisi Formulir Digital:&#xa;* Jenis Cuti (Tahunan/Sakit/Penting)&#xa;* Tanggal &amp; Durasi Hari&#xa;* Alasan Pengajuan Izin" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="pool_kc">
+          <mxGeometry x="40" y="150" width="270" height="70" as="geometry"/>
+        </mxCell>
+        <mxCell id="kc3" value="Klik &quot;Kirim Pengajuan Cuti&quot;&#xa;secara Paperless" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="pool_kc">
+          <mxGeometry x="40" y="270" width="270" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="kc4" value="Notifikasi Putusan Langsung Muncul&#xa;di Layar HP Karyawan (ACC / Ditolak)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontColor=#274e13;fontSize=11;" vertex="1" parent="pool_kc">
+          <mxGeometry x="40" y="730" width="270" height="60" as="geometry"/>
+        </mxCell>
+
+        <!-- Pool Admin HR -->
+        <mxCell id="pool_ac" value="ADMIN HR &amp; SISTEM hadir." style="swimlane;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontColor=#274e13;fontStyle=1;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="430" y="40" width="350" height="920" as="geometry"/>
+        </mxCell>
+        <mxCell id="ac1" value="Sistem Menyimpan Pengajuan&#xa;dengan Status: &quot;Menunggu&quot;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;" vertex="1" parent="pool_ac">
+          <mxGeometry x="40" y="270" width="270" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="ac2" value="Admin HR Membuka Dasbor &amp;&#xa;Memeriksa Sisa Kuota serta Alasan" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;" vertex="1" parent="pool_ac">
+          <mxGeometry x="40" y="380" width="270" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="ac3" value="Pengajuan&#xa;Disetujui?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;fontStyle=1;" vertex="1" parent="pool_ac">
+          <mxGeometry x="110" y="480" width="130" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="ac4" value="Disetujui: Potong Kuota Cuti&#xa;&amp; Status: &quot;Disetujui&quot;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontColor=#274e13;fontSize=11;" vertex="1" parent="pool_ac">
+          <mxGeometry x="10" y="600" width="150" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="ac5" value="Ditolak: Catat Alasan&#xa;&amp; Status: &quot;Ditolak&quot;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontColor=#990000;fontSize=11;" vertex="1" parent="pool_ac">
+          <mxGeometry x="190" y="600" width="150" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="ac6" value="Rekap Data Cuti Otomatis Tersimpan&#xa;di Laporan Bulanan HR" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontColor=#274e13;fontSize=11;" vertex="1" parent="pool_ac">
+          <mxGeometry x="40" y="730" width="270" height="60" as="geometry"/>
+        </mxCell>
+
+        <!-- Selesai -->
+        <mxCell id="end_cuti" value="Selesai" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontColor=#274e13;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="340" y="870" width="140" height="50" as="geometry"/>
+        </mxCell>
+
+        <!-- Edges -->
+        <mxCell id="kec1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=1.5;strokeColor=#333333;" edge="1" parent="1" source="kc1" target="kc2"/>
+        <mxCell id="kec2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=1.5;strokeColor=#333333;" edge="1" parent="1" source="kc2" target="kc3"/>
+        <mxCell id="kec3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=1.5;strokeColor=#333333;" edge="1" parent="1" source="kc3" target="ac1"/>
+        <mxCell id="kec4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=1.5;strokeColor=#333333;" edge="1" parent="1" source="ac1" target="ac2"/>
+        <mxCell id="kec5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=1.5;strokeColor=#333333;" edge="1" parent="1" source="ac2" target="ac3"/>
+        <mxCell id="kec6" value="Ya" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=1.5;strokeColor=#82b366;fontColor=#274e13;fontStyle=1;" edge="1" parent="1" source="ac3" target="ac4"/>
+        <mxCell id="kec7" value="Tidak" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=1.5;strokeColor=#b85450;fontColor=#990000;fontStyle=1;" edge="1" parent="1" source="ac3" target="ac5"/>
+        <mxCell id="kec8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=1.5;strokeColor=#333333;" edge="1" parent="1" source="ac4" target="kc4"/>
+        <mxCell id="kec9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=1.5;strokeColor=#333333;" edge="1" parent="1" source="ac5" target="kc4"/>
+        <mxCell id="kec10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=1.5;strokeColor=#333333;" edge="1" parent="1" source="ac4" target="ac6"/>
+        <mxCell id="kec11" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=1.5;strokeColor=#333333;" edge="1" parent="1" source="ac5" target="ac6"/>
+        <mxCell id="kec12" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=1.5;strokeColor=#333333;" edge="1" parent="1" source="kc4" target="end_cuti"/>
+        <mxCell id="kec13" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=1.5;strokeColor=#333333;" edge="1" parent="1" source="ac6" target="end_cuti"/>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

@@ -1,0 +1,39 @@
+<mxfile host="app.diagrams.net" modified="2026-11-18T01:30:00.000Z" agent="Draw.io" version="24.7.5">
+  <diagram id="erd_diagram" name="ERD Sistem hadir.">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        
+        <!-- Entity Karyawan -->
+        <mxCell id="ent_karyawan" value="TABEL KARYAWAN&#xa;&#xa;* ID Pegawai (Kunci Utama)&#xa;* NIP (Teks)&#xa;* Nama Lengkap (Teks)&#xa;* Email Dinas (Teks)&#xa;* Kata Sandi (Teks)&#xa;* Jabatan (Teks)&#xa;* Divisi Kerja (Teks)&#xa;* Status Keaktifan (Teks)" style="shape=table;startSize=30;container=1;collapsible=0;childLayout=tableLayout;fixedRows=1;rowLines=0;fontStyle=1;align=center;resizeLast=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#1b365d;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="60" y="60" width="260" height="200" as="geometry"/>
+        </mxCell>
+
+        <!-- Entity Log Presensi -->
+        <mxCell id="ent_presensi" value="TABEL LOG PRESENSI&#xa;&#xa;* ID Presensi (Kunci Utama)&#xa;* NIP Pegawai (Penghubung)&#xa;* Titik Kantor (Penghubung)&#xa;* Jam Masuk (Waktu)&#xa;* Tanggal Hadir (Tanggal)&#xa;* Jarak GPS (Angka/Meter)&#xa;* Status Kehadiran (Teks)" style="shape=table;startSize=30;container=1;collapsible=0;childLayout=tableLayout;fixedRows=1;rowLines=0;fontStyle=1;align=center;resizeLast=1;fillColor=#d5e8d4;strokeColor=#82b366;fontColor=#274e13;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="460" y="60" width="260" height="190" as="geometry"/>
+        </mxCell>
+
+        <!-- Entity Cuti -->
+        <mxCell id="ent_cuti" value="TABEL PENGAJUAN CUTI&#xa;&#xa;* ID Cuti (Kunci Utama)&#xa;* NIP Pemohon (Penghubung)&#xa;* Jenis Cuti (Teks)&#xa;* Tanggal Izin (Tanggal)&#xa;* Durasi Hari (Teks)&#xa;* Alasan Izin (Teks)&#xa;* Status Putusan (Teks)" style="shape=table;startSize=30;container=1;collapsible=0;childLayout=tableLayout;fixedRows=1;rowLines=0;fontStyle=1;align=center;resizeLast=1;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#7f6000;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="60" y="340" width="260" height="190" as="geometry"/>
+        </mxCell>
+
+        <!-- Entity Kantor -->
+        <mxCell id="ent_kantor" value="TABEL LOKASI KANTOR&#xa;&#xa;* ID Kantor (Kunci Utama)&#xa;* Nama Tempat: UNPAM Viktor 2&#xa;* Titik GPS: Lintang &amp; Bujur&#xa;* Batas Aman: 100 Meter" style="shape=table;startSize=30;container=1;collapsible=0;childLayout=tableLayout;fixedRows=1;rowLines=0;fontStyle=1;align=center;resizeLast=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontColor=#4c004c;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="460" y="340" width="260" height="150" as="geometry"/>
+        </mxCell>
+
+        <!-- Relasi Karyawan - Presensi -->
+        <mxCell id="rel1" value="1 : M (Mencatat Presensi)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=2;strokeColor=#1b365d;fontSize=11;fontStyle=1;" edge="1" parent="1" source="ent_karyawan" target="ent_presensi"/>
+
+        <!-- Relasi Karyawan - Cuti -->
+        <mxCell id="rel2" value="1 : M (Mengajukan Cuti)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=2;strokeColor=#1b365d;fontSize=11;fontStyle=1;" edge="1" parent="1" source="ent_karyawan" target="ent_cuti"/>
+
+        <!-- Relasi Kantor - Presensi -->
+        <mxCell id="rel3" value="1 : M (Titik Validasi GPS)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeWidth=2;strokeColor=#1b365d;fontSize=11;fontStyle=1;" edge="1" parent="1" source="ent_kantor" target="ent_presensi"/>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

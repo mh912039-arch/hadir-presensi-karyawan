@@ -354,7 +354,7 @@ def create_report():
     add_heading_3("2.2.2 Flowchart Sistem yang Berjalan")
     diag_flowchart = r"D:\TUGAS\SIM SMT5\docs\diagram_images\flowchart_berjalan.png"
     add_image_centered(diag_flowchart, width_cm=13.5)
-    add_caption("Gambar 2.1 Flowchart Sistem Presensi dan Pengajuan Cuti yang Sedang Berjalan")
+    add_caption("Gambar 2.1 Flowchart Sistem Presensi dan Pengajuan Cuti yang Sedang Berjalan (Draw.io)")
 
     add_heading_2("2.3 Identifikasi Masalah")
     add_p("Tabel 2.1 Matriks Identifikasi Masalah", bold=True, size=11.5, space_after=3)
@@ -452,8 +452,8 @@ def create_report():
     add_heading_3("3.2.1 Flowchart Sistem Usulan - Presensi Berbasis GPS (Geofencing)")
     diag_flow_presensi = r"D:\TUGAS\SIM SMT5\docs\diagram_images\flowchart_usulan_presensi.png"
     add_image_centered(diag_flow_presensi, width_cm=13.5)
-    add_caption("Gambar 3.1 Flowchart Sistem Usulan - Presensi Berbasis GPS (Geofencing)")
-    add_p("Flowchart pada Gambar 3.1 menggambarkan alur kerja presensi mandiri karyawan menggunakan sistem hadir. berbasis validasi sensor lokasi GPS:")
+    add_caption("Gambar 3.1 Flowchart Sistem Usulan - Presensi Berbasis GPS (Geofencing) (Draw.io)")
+    add_p("Flowchart pada Gambar 3.1 menggambarkan alur kerja presensi mandiri karyawan menggunakan sistem hadir. berbasis validasi sensor lokasi GPS (dirancang dengan standar notasi Draw.io):")
     add_p("1. Karyawan membuka peramban ponsel pintar dan mengakses web mobile hadir. saat tiba di area Kampus UNPAM Viktor 2.")
     add_p("2. Sistem melalui Geolocation API mendeteksi koordinat lintang dan bujur posisi ponsel secara otomatis.")
     add_p("3. Jika sensor GPS ponsel dalam kondisi mati atau izin lokasi ditolak, sistem menampilkan peringatan dan mengunci tombol login/presensi.")
@@ -466,8 +466,8 @@ def create_report():
     add_heading_3("3.2.2 Flowchart Sistem Usulan - Pengajuan dan Persetujuan Cuti Digital")
     diag_flow_cuti = r"D:\TUGAS\SIM SMT5\docs\diagram_images\flowchart_usulan_cuti.png"
     add_image_centered(diag_flow_cuti, width_cm=13.5)
-    add_caption("Gambar 3.2 Flowchart Sistem Usulan - Pengajuan dan Persetujuan Cuti Digital")
-    add_p("Flowchart pada Gambar 3.2 menggambarkan alur pengajuan dan persetujuan izin/cuti karyawan secara paperless:")
+    add_caption("Gambar 3.2 Flowchart Sistem Usulan - Pengajuan dan Persetujuan Cuti Digital (Draw.io)")
+    add_p("Flowchart pada Gambar 3.2 menggambarkan alur pengajuan dan persetujuan izin/cuti karyawan secara paperless (dirancang dengan standar notasi Draw.io):")
     add_p("1. Karyawan memilih menu Pengajuan Cuti pada antarmuka aplikasi hadir. di ponsel pribadinya.")
     add_p("2. Karyawan mengisi formulir digital yang meliputi jenis cuti (Tahunan, Sakit, atau Alasan Penting), tanggal cuti, durasi hari, dan uraian alasan izin.")
     add_p("3. Karyawan menekan tombol Kirim Pengajuan, sistem menyimpan data pengajuan dengan status 'Menunggu' dan langsung memperbarui daftar pengajuan di portal Admin HR.")
@@ -480,7 +480,7 @@ def create_report():
     add_heading_3("3.3.1 Entity Relationship Diagram (ERD)")
     diag_erd = r"D:\TUGAS\SIM SMT5\docs\diagram_images\erd_diagram.png"
     add_image_centered(diag_erd, width_cm=13.5)
-    add_caption("Gambar 3.3 Entity Relationship Diagram (ERD) Sistem Informasi hadir.")
+    add_caption("Gambar 3.3 Entity Relationship Diagram (ERD) Sistem Informasi hadir. (Draw.io)")
 
     add_heading_3("3.3.2 Kamus Data (Data Dictionary)")
     
