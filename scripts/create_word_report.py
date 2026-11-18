@@ -257,9 +257,9 @@ def create_report():
     add_heading_1("BAB I\nPERENCANAAN SISTEM")
 
     add_heading_2("1.1 Latar Belakang")
-    add_p("PT Nusantara Digital merupakan entitas usaha yang bergerak di bidang solusi teknologi informasi dan pengembangan perangkat lunak. Pada kantor operasional Kampus UNPAM Viktor 2, pengelolaan absensi karyawan saat ini masih menggunakan pencatatan manual pada buku presensi cetak dan koordinasi izin via perpesanan instan WhatsApp.")
-    add_p("Pola manual ini memicu kendala operasional yang signifikan: tingginya potensi kecurangan presensi (titip absen), ketidakakuratan verifikasi fisik karyawan di lokasi kerja, serta alur pengajuan dan persetujuan cuti yang lambat (membutuhkan waktu 3 hingga 5 hari kerja). Dampaknya, divisi Human Resources (HR) kesulitan menyajikan rekapitulasi kehadiran yang sahih dan akurat setiap akhir bulan.")
-    add_p("Untuk mengatasi permasalahan tersebut, dirancang Sistem Informasi Manajemen Presensi dan Kepegawaian berbasis Web Mobile / Progressive Web App (PWA) bernama hadir.. Sistem ini mengintegrasikan verifikasi koordinat GPS (geo-fencing) dengan batas radius 100 meter di UNPAM Viktor 2, modul persetujuan cuti digital secara real-time, dan dasbor pemantauan terpusat bagi manajemen.")
+    add_p("PT Nusantara Digital merupakan entitas usaha yang bergerak di bidang solusi teknologi informasi dan rekayasa perangkat lunak. Pada kantor operasional Kampus Universitas Pamulang Gedung Viktor 2 Lt. 5, pengelolaan kehadiran karyawan saat ini masih mengandalkan pencatatan tanda tangan manual pada buku presensi cetak dan koordinasi permohonan izin/cuti melalui pesan obrolan instan WhatsApp.")
+    add_p("Pola manual konvensional tersebut memicu 3 (tiga) masalah utama yang menghambat efisiensi operasional organisasi: (1) tingginya potensi kecurangan presensi (titip absen) karena ketiadaan validasi koordinat lokasi fisik karyawan saat mencatat kehadiran, (2) alur pengajuan dan persetujuan cuti yang memakan waktu lama (3 hingga 5 hari kerja) akibat formulir kertas dan riwayat chat personal sering terselip atau lambat direspons, serta (3) proses rekapitulasi laporan kehadiran bulanan yang lambat dan rawan human error karena staf Human Resources (HR) harus memindahkan data tanda tangan fisik satu per satu ke lembar kerja Microsoft Excel di setiap akhir bulan.")
+    add_p("Untuk menyelesaikan ketiga permasalahan tersebut secara berkesinambungan, dirancang Sistem Informasi Manajemen Presensi dan Kepegawaian berbasis Web Mobile / Progressive Web App (PWA) bernama hadir.. Sistem ini mengintegrasikan verifikasi sensor GPS (geo-fencing) berjarak radius aman maksimal 100 meter dari Kampus UNPAM Viktor 2, modul pengajuan dan persetujuan cuti digital (paperless) dengan notifikasi seketika di ponsel pemohon, serta dasbor rekapitulasi data kehadiran otomatis dan terpusat bagi manajemen.")
 
     add_heading_2("1.2 Profil Organisasi")
     add_p("Tabel 1.1 Profil Organisasi", bold=True, size=11.5, space_after=3)
@@ -277,20 +277,21 @@ def create_report():
     style_table(tbl_1_1, col_w_1_1, headers_1_1, data_1_1)
 
     add_heading_2("1.3 Rumusan Masalah")
-    add_p("1. Bagaimana merancang mekanisme pencatatan presensi digital berbasis GPS yang dapat memvalidasi posisi fisik karyawan di dalam radius 100 meter Kampus UNPAM Viktor 2 secara akurat?")
-    add_p("2. Bagaimana membangun modul pengajuan izin dan cuti kerja karyawan secara paperless dengan sistem notifikasi putusan (approval/rejection) langsung ke perangkat pemohon?")
-    add_p("3. Bagaimana menyajikan informasi log kehadiran dan rekapitulasi kepegawaian secara real-time bagi Admin HR dan manajemen untuk mendukung pengambilan keputusan?")
+    add_p("1. Bagaimana merancang mekanisme presensi digital berbasis GPS (geo-fencing) yang dapat memvalidasi posisi fisik karyawan di dalam batas radius 100 meter Kampus UNPAM Viktor 2 guna mencegah kecurangan titip absen?")
+    add_p("2. Bagaimana membangun modul pengajuan izin dan cuti karyawan secara paperless dengan notifikasi persetujuan instan langsung ke perangkat ponsel pemohon?")
+    add_p("3. Bagaimana menyajikan informasi log kehadiran dan rekapitulasi data kepegawaian secara otomatis dan real-time bagi Admin HR untuk menggantikan proses rekapitulasi manual di Excel?")
 
     add_heading_2("1.4 Tujuan dan Manfaat")
     add_heading_3("1.4.1 Tujuan Proyek")
-    add_p("1. Merancang dan mengimplementasikan sistem presensi digital berbasis geo-fencing GPS dengan radius validasi 100 meter di UNPAM Viktor 2 guna mencegah manipulasi kehadiran.")
-    add_p("2. Mengembangkan alur kerja digital untuk pengajuan, validasi, dan persetujuan cuti/izin karyawan secara transparan dan otomatis.")
-    add_p("3. Membangun modul pelaporan dan pemantauan terpusat yang menghasilkan data kehadiran siap saji untuk Admin HR dan pimpinan.")
+    add_p("1. Mencegah manipulasi kehadiran (titip absen) dengan menerapkan validasi sensor GPS ponsel pada radius aman maksimal 100 meter dari Kampus UNPAM Viktor 2.")
+    add_p("2. Mempercepat siklus pengajuan dan persetujuan cuti karyawan dari 3–5 hari menjadi hitungan menit melalui formulir digital dan notifikasi putusan instan.")
+    add_p("3. Mengotomatiskan proses rekapitulasi kehadiran dan pemantauan sisa hak cuti karyawan sehingga laporan dapat tersaji secara langsung bagi Admin HR dan pimpinan tanpa perlu salin manual ke Excel.")
 
     add_heading_3("1.4.2 Manfaat Proyek")
-    add_p("• Bagi Organisasi: Meningkatkan integritas data absensi, menghemat biaya operasional kertas formulir, serta mereduksi waktu rekapitulasi kehadiran hingga 70%.")
-    add_p("• Bagi Pengguna: Karyawan memperoleh kepastian status presensi dan notifikasi cuti secara instan melalui ponsel pintar; Admin HR dapat mengelola data staf dan log audit dengan cepat.")
-    add_p("• Bagi Penulis: Mengaplikasikan teori mata kuliah Sistem Informasi Manajemen dan metodologi System Development Life Cycle (SDLC) dalam memecahkan masalah nyata di industri.")
+    add_p("• Bagi Karyawan: Memberikan kepastian validasi kehadiran yang adil dan transparan, proses pengajuan cuti yang praktis tanpa formulir kertas, serta notifikasi keputusan langsung di layar ponsel.")
+    add_p("• Bagi Admin HR: Mengeliminasi beban kerja rekapitulasi lembar absensi di akhir bulan hingga 80%, memastikan keaslian lokasi presensi staf, serta mengelola arsip kepegawaian secara terpadu.")
+    add_p("• Bagi Organisasi: Meningkatkan kedisiplinan kerja, meniadakan biaya pengadaan kertas formulir presensi, serta menyediakan data absensi yang sahih untuk dasar evaluasi kinerja.")
+    add_p("• Bagi Penulis: Mengaplikasikan konsep mata kuliah Sistem Informasi Manajemen (SIM) dan tahapan System Development Life Cycle (SDLC) dalam merancang solusi perangkat lunak yang solutif.")
 
     add_heading_2("1.5 Ruang Lingkup")
     add_heading_3("1.5.1 Batasan Sistem (In-Scope)")
@@ -357,14 +358,13 @@ def create_report():
 
     add_heading_2("2.3 Identifikasi Masalah")
     add_p("Tabel 2.1 Matriks Identifikasi Masalah", bold=True, size=11.5, space_after=3)
-    tbl_2_1 = doc.add_table(rows=5, cols=4)
+    tbl_2_1 = doc.add_table(rows=4, cols=4)
     col_w_2_1 = [Cm(1.2), Cm(4.5), Cm(4.5), Cm(5.3)]
     headers_2_1 = ["No", "Masalah", "Penyebab", "Dampak"]
     data_2_1 = [
-        ["1", "Presensi tidak mencerminkan kehadiran fisik aktual (titip absen)", "Pencatatan tanda tangan manual tanpa validasi koordinat lokasi", "Terjadi kecurangan absensi dan ketidakdisiplinan jam kerja karyawan."],
-        ["2", "Proses persetujuan cuti memakan waktu lama (3–5 hari)", "Pengajuan menggunakan formulir fisik dan perpesanan pribadi", "Dokumen sering terselip; karyawan tidak mendapat kepastian hak libur kerja."],
-        ["3", "Perhitungan sisa kuota cuti sering salah rekap", "Pencatatan kuota cuti terpisah di buku arsip personal HR", "Potensi klaim cuti melebihi hak tahunan karyawan."],
-        ["4", "Rekapitulasi laporan kehadiran bulanan lambat", "Pemindahan data manual dari kertas ke lembar kerja Excel", "Waktu kerja HR tersita 3–5 hari kerja setiap akhir bulan."]
+        ["1", "Presensi tidak mencerminkan kehadiran fisik aktual (titip absen)", "Pencatatan tanda tangan manual tanpa validasi koordinat lokasi GPS karyawan", "Terjadi manipulasi kehadiran, ketidakhadiran fisik di kantor tidak terdeteksi, dan kedisiplinan jam kerja menurun."],
+        ["2", "Proses pengajuan dan persetujuan cuti lambat (3–5 hari kerja)", "Pengajuan memakai formulir kertas fisik dan pesan WhatsApp personal yang sering terselip", "Karyawan tidak mendapat kepastian hak libur kerja tepat waktu dan mengganggu koordinasi jadwal kerja divisi."],
+        ["3", "Rekapitulasi laporan kehadiran bulanan lambat dan rawan salah hitung", "Pemindahan data presensi dan sisa kuota cuti dari kertas ke Microsoft Excel dilakukan manual oleh HR", "Waktu kerja staf HR tersita 3 hingga 5 hari kerja di setiap akhir bulan hanya untuk merekap lembar absensi."]
     ]
     style_table(tbl_2_1, col_w_2_1, headers_2_1, data_2_1)
 
@@ -449,15 +449,32 @@ def create_report():
     style_table(tbl_3_1, col_w_3_1, headers_3_1, data_3_1)
 
     add_heading_2("3.2 Desain Proses")
-    add_heading_3("3.2.1 Diagram Konteks (DFD Level 0)")
-    diag_dfd0 = r"D:\TUGAS\SIM SMT5\docs\diagram_images\dfd_level_0.png"
-    add_image_centered(diag_dfd0, width_cm=13.5)
-    add_caption("Gambar 3.1 Diagram Konteks (DFD Level 0) Sistem Informasi hadir.")
+    add_heading_3("3.2.1 Flowchart Sistem Usulan - Presensi Berbasis GPS (Geofencing)")
+    diag_flow_presensi = r"D:\TUGAS\SIM SMT5\docs\diagram_images\flowchart_usulan_presensi.png"
+    add_image_centered(diag_flow_presensi, width_cm=13.5)
+    add_caption("Gambar 3.1 Flowchart Sistem Usulan - Presensi Berbasis GPS (Geofencing)")
+    add_p("Flowchart pada Gambar 3.1 menggambarkan alur kerja presensi mandiri karyawan menggunakan sistem hadir. berbasis validasi sensor lokasi GPS:")
+    add_p("1. Karyawan membuka peramban ponsel pintar dan mengakses web mobile hadir. saat tiba di area Kampus UNPAM Viktor 2.")
+    add_p("2. Sistem melalui Geolocation API mendeteksi koordinat lintang dan bujur posisi ponsel secara otomatis.")
+    add_p("3. Jika sensor GPS ponsel dalam kondisi mati atau izin lokasi ditolak, sistem menampilkan peringatan dan mengunci tombol login/presensi.")
+    add_p("4. Jika GPS aktif, sistem menghitung jarak fisik pengguna terhadap titik acuan Kampus UNPAM Viktor 2 (-6.3458, 106.6917).")
+    add_p("5. Jika posisi karyawan berada di luar batas radius 100 meter, akses login dan tombol presensi dikunci (akses ditolak guna mencegah titip absen).")
+    add_p("6. Jika posisi berada di dalam radius aman (jarak <= 100 meter), tombol presensi terbuka dan karyawan dapat memasukkan kredensial login serta menekan tombol presensi masuk.")
+    add_p("7. Sistem secara otomatis mencatat log presensi (NIP, jam masuk WIB, tanggal, koordinat, jarak meter, dan status tepat waktu) ke database.")
+    add_p("8. Notifikasi presensi berhasil muncul di layar ponsel karyawan dan data kehadiran seketika tampil pada dasbor pemantauan Admin HR secara real-time.")
 
-    add_heading_3("3.2.2 DFD Level 1 (Dekomposisi Proses)")
-    diag_dfd1 = r"D:\TUGAS\SIM SMT5\docs\diagram_images\dfd_level_1.png"
-    add_image_centered(diag_dfd1, width_cm=13.5)
-    add_caption("Gambar 3.2 DFD Level 1 / Flowchart Sistem Usulan hadir.")
+    add_heading_3("3.2.2 Flowchart Sistem Usulan - Pengajuan dan Persetujuan Cuti Digital")
+    diag_flow_cuti = r"D:\TUGAS\SIM SMT5\docs\diagram_images\flowchart_usulan_cuti.png"
+    add_image_centered(diag_flow_cuti, width_cm=13.5)
+    add_caption("Gambar 3.2 Flowchart Sistem Usulan - Pengajuan dan Persetujuan Cuti Digital")
+    add_p("Flowchart pada Gambar 3.2 menggambarkan alur pengajuan dan persetujuan izin/cuti karyawan secara paperless:")
+    add_p("1. Karyawan memilih menu Pengajuan Cuti pada antarmuka aplikasi hadir. di ponsel pribadinya.")
+    add_p("2. Karyawan mengisi formulir digital yang meliputi jenis cuti (Tahunan, Sakit, atau Alasan Penting), tanggal cuti, durasi hari, dan uraian alasan izin.")
+    add_p("3. Karyawan menekan tombol Kirim Pengajuan, sistem menyimpan data pengajuan dengan status 'Menunggu' dan langsung memperbarui daftar pengajuan di portal Admin HR.")
+    add_p("4. Admin HR membuka dasbor pengelola untuk memeriksa alasan pengajuan dan sisa kuota hak cuti tahunan pemohon.")
+    add_p("5. Admin HR mengambil keputusan: jika disetujui, kuota cuti dipotong otomatis dan status berubah menjadi 'Disetujui'; jika ditolak, Admin HR mencantumkan catatan penolakan dan status berubah menjadi 'Ditolak'.")
+    add_p("6. Sistem secara instan mengirimkan notifikasi putusan langsung ke layar ponsel karyawan pemohon saat itu juga.")
+    add_p("7. Data keputusan cuti otomatis terekap ke dalam laporan kepegawaian bulanan tanpa perlu formulir kertas manual.")
 
     add_heading_2("3.3 Desain Data")
     add_heading_3("3.3.1 Entity Relationship Diagram (ERD)")
